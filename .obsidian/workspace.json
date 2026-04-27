@@ -11,14 +11,17 @@
             "id": "36e2b7bf547fff30",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "canvas",
               "state": {
-                "file": "ok.md",
-                "mode": "source",
-                "source": false
+                "file": "未命名 1.canvas",
+                "viewState": {
+                  "x": 0,
+                  "y": 0,
+                  "zoom": 0
+                }
               },
-              "icon": "lucide-file",
-              "title": "ok"
+              "icon": "lucide-layout-dashboard",
+              "title": "未命名 1"
             }
           }
         ]
@@ -94,7 +97,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "ok.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +106,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "ok 的反向链接列表"
+              "title": "反向链接"
             }
           },
           {
@@ -113,12 +115,11 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "ok.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "ok 的出链列表"
+              "title": "出链"
             }
           },
           {
@@ -156,13 +157,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "ok.md",
+                "file": "2026-04-27.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "ok 的大纲"
+              "title": "2026-04-27 的大纲"
             }
           }
         ]
@@ -180,11 +181,15 @@
       "daily-notes:打开/创建今天的日记": false,
       "templates:插入模板": false,
       "command-palette:打开命令面板": false,
-      "bases:新建数据库": false
+      "bases:新建数据库": false,
+      "obsidian-git:Open Git source control": false
     }
   },
-  "active": "36e2b7bf547fff30",
+  "active": "77dc551c60cf1e94",
   "lastOpenFiles": [
+    "未命名 1.canvas",
+    "2026-04-27.md",
+    "未命名.canvas",
     "ok.md",
     "新建 DOCX 文档.docx",
     "新建 文本文档.txt",
