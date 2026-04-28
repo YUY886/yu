@@ -11,17 +11,14 @@
             "id": "36e2b7bf547fff30",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "markdown",
               "state": {
-                "file": "未命名 1.canvas",
-                "viewState": {
-                  "x": 0,
-                  "y": 0,
-                  "zoom": 0
-                }
+                "file": "ok.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-layout-dashboard",
-              "title": "未命名 1"
+              "icon": "lucide-file",
+              "title": "ok"
             }
           }
         ]
@@ -97,6 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "ok.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -106,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "反向链接"
+              "title": "ok 的反向链接列表"
             }
           },
           {
@@ -115,11 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "ok.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "出链"
+              "title": "ok 的出链列表"
             }
           },
           {
@@ -157,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "2026-04-27.md",
+                "file": "ok.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "2026-04-27 的大纲"
+              "title": "ok 的大纲"
             }
           }
         ]
@@ -185,10 +184,10 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "77dc551c60cf1e94",
+  "active": "36e2b7bf547fff30",
   "lastOpenFiles": [
-    "未命名 1.canvas",
     "2026-04-27.md",
+    "未命名 1.canvas",
     "未命名.canvas",
     "ok.md",
     "新建 DOCX 文档.docx",
