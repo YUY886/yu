@@ -11,12 +11,14 @@
             "id": "36e2b7bf547fff30",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "Pasted image 20260428125746.png"
+                "file": "ok.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-image",
-              "title": "Pasted image 20260428125746"
+              "icon": "lucide-file",
+              "title": "ok"
             }
           }
         ]
@@ -184,10 +186,11 @@
   },
   "active": "36e2b7bf547fff30",
   "lastOpenFiles": [
+    "Pasted image 20260428125746.png",
+    "![]Pasted image 20260428130552.png",
     "Pasted image 20260428130552.png",
     "ok.md",
     "![](Pasted image 20260428130552.png)",
-    "Pasted image 20260428125746.png",
     "2026-04-27.md",
     "未命名 1.canvas",
     "未命名.canvas",
