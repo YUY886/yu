@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "电路.md",
+                "file": "大物下速通课.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "电路"
+              "title": "大物下速通课"
             }
           }
         ]
@@ -194,11 +194,13 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "77dc551c60cf1e94",
+  "active": "36e2b7bf547fff30",
   "lastOpenFiles": [
+    "电路.md",
+    "大物下速通课.md",
+    "Pasted image 20260509140919.png",
     "未命名",
     "3a1c77822fb4f56b48500db002eaa64e.jpg",
-    "电路.md",
     "Pasted image 20260428131922.png",
     "Pasted image 20260428125746.png",
     "![]Pasted image 20260428130552.png",
