@@ -1,6 +1,7 @@
 {
   "useMarkdownLinks": true,
   "userIgnoreFilters": [
-    "*.png"
+    "*.png",
+    "*.PNG"
   ]
 }
