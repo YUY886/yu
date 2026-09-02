@@ -11,10 +11,14 @@
             "id": "36e2b7bf547fff30",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "我的第一篇笔记.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "新标签页"
+              "title": "我的第一篇笔记"
             }
           }
         ]
@@ -195,9 +199,12 @@
   },
   "active": "77dc551c60cf1e94",
   "lastOpenFiles": [
+    "附件",
+    "笔记",
+    "我的第一篇笔记.md",
+    "Pasted image 20260509190635.png",
     "Pasted image 20260510155703.png",
     "Pasted image 20260509193341.png",
-    "Pasted image 20260509190635.png",
     "Pasted image 20260509192017.png",
     "Pasted image 20260509192259.png",
     "Pasted image 20260510150919.png",
@@ -207,7 +214,6 @@
     "Pasted image 20260509192813.png",
     "大物速通/大物下速通课.md",
     "电路.md",
-    "3a1c77822fb4f56b48500db002eaa64e.jpg",
     "2026-05-10.md",
     "未命名.canvas",
     "大物速通",
