@@ -28,16 +28,16 @@ updated: 2026-09-26
 
 课程配套 `OLED.h` 里的**全部 8 个函数**，一个不多一个不少：
 
-| # | 函数原型 | 作用 | 参数 | 典型调用 |
-| --- | --- | --- | --- | --- |
-| 1 | `void OLED_Init(void)` | 初始化（引脚 → I2C → SSD1306 命令 → 清屏） | 无 | `OLED_Init();` |
-| 2 | `void OLED_Clear(void)` | 清屏（全屏写 `0x00`） | 无 | `OLED_Clear();` |
-| 3 | `void OLED_ShowChar(uint8_t Line, uint8_t Column, char Char)` | 显示 **1 个 ASCII 字符** | 行 1~4、列 1~16、字符 | `OLED_ShowChar(1, 1, 'A');` |
-| 4 | `void OLED_ShowString(uint8_t Line, uint8_t Column, char *String)` | 显示**字符串** | 行、起始列、字符串 | `OLED_ShowString(1, 3, "Hello");` |
-| 5 | `void OLED_ShowNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length)` | 显示**无符号十进制** | 行、列、数、**位数** | `OLED_ShowNum(2, 1, 12345, 5);` |
-| 6 | `void OLED_ShowSignedNum(uint8_t Line, uint8_t Column, int32_t Number, uint8_t Length)` | 显示**有符号十进制** | 行、列、数、位数 | `OLED_ShowSignedNum(2, 7, -66, 2);` |
-| 7 | `void OLED_ShowHexNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length)` | 显示**十六进制** | 行、列、数、位数 | `OLED_ShowHexNum(3, 1, 0xAA55, 4);` |
-| 8 | `void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length)` | 显示**二进制** | 行、列、数、位数 | `OLED_ShowBinNum(4, 1, 0xAA55, 16);` |
+| #   | 函数原型                                                                                    | 作用                              | 参数              | 典型调用                                 |
+| --- | --------------------------------------------------------------------------------------- | ------------------------------- | --------------- | ------------------------------------ |
+| 1   | `void OLED_Init(void)`                                                                  | 初始化（引脚 → I2C → SSD1306 命令 → 清屏） | 无               | `OLED_Init();`                       |
+| 2   | `void OLED_Clear(void)`                                                                 | 清屏（全屏写 `0x00`）                  | 无               | `OLED_Clear();`                      |
+| 3   | `void OLED_ShowChar(uint8_t Line, uint8_t Column, char Char)`                           | 显示 **1 个 ASCII 字符**             | 行 1~4、列 1~16、字符 | `OLED_ShowChar(1, 1, 'A');`          |
+| 4   | `void OLED_ShowString(uint8_t Line, uint8_t Column, char *String)`                      | 显示**字符串**                       | 行、起始列、字符串       | `OLED_ShowString(1, 3, "Hello");`    |
+| 5   | `void OLED_ShowNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length)`      | 显示**无符号十进制**                    | 行、列、数、**位数**    | `OLED_ShowNum(2, 1, 12345, 5);`      |
+| 6   | `void OLED_ShowSignedNum(uint8_t Line, uint8_t Column, int32_t Number, uint8_t Length)` | 显示**有符号十进制**                    | 行、列、数、位数        | `OLED_ShowSignedNum(2, 7, -66, 2);`  |
+| 7   | `void OLED_ShowHexNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length)`   | 显示**十六进制**                      | 行、列、数、位数        | `OLED_ShowHexNum(3, 1, 0xAA55, 4);`  |
+| 8   | `void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Length)`   | 显示**二进制**                       | 行、列、数、位数        | `OLED_ShowBinNum(4, 1, 0xAA55, 16);` |
 
 ### 1.1 每个函数取值范围的官方注释
 

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "笔记/STM32/江协科技/03 GPIO/江协STM32 03-4 按键控制LED与光敏传感器.md",
+                "file": "笔记/STM32/江协科技/江协STM32 课程总索引.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "江协STM32 03-4 按键控制LED与光敏传感器"
+              "title": "江协STM32 课程总索引"
             }
           }
         ]
@@ -199,24 +199,24 @@
   },
   "active": "36e2b7bf547fff30",
   "lastOpenFiles": [
+    "笔记/STM32/江协科技/03 GPIO/江协STM32 03-4 按键控制LED与光敏传感器.md",
+    "笔记/STM32/江协科技/01 STM32简介/江协STM32 01-2 STM32简介.md",
+    "笔记/STM32/江协科技/05 EXTI外部中断/江协STM32 05-2 红外传感器计次与旋转编码器计次.md",
+    "笔记/STM32/江协科技/04 OLED/江协STM32 04 OLED（章索引）.md",
+    "笔记/STM32/江协科技/04 OLED/江协STM32 04-1 OLED调试工具.md",
+    "笔记/STM32/江协科技/04 OLED/江协STM32 04-2 OLED显示屏.md",
+    "笔记/STM32/江协科技/03 GPIO/江协STM32 03 GPIO（章索引）.md",
+    "笔记/STM32/江协科技/03 GPIO/江协STM32 03-1 GPIO输出.md",
+    "笔记/STM32/江协科技/03 GPIO/江协STM32 03-2 LED闪烁与流水灯与蜂鸣器.md",
+    "笔记/STM32/江协科技/03 GPIO/江协STM32 03-3 GPIO输入.md",
     "笔记/STM32/江协科技/02 开发环境搭建/江协STM32 02-2 新建工程.md",
     "笔记/STM32/江协科技/02 开发环境搭建/江协STM32 02-1 软件安装.md",
     "笔记/STM32/江协科技/01 STM32简介/江协STM32 01 STM32简介（章索引）.md",
-    "笔记/STM32/江协科技/01 STM32简介/江协STM32 01-2 STM32简介.md",
     "笔记/STM32/江协科技/06 TIM定时器/江协STM32 06-8 编码器接口测速.md",
-    "笔记/STM32/江协科技/05 EXTI外部中断/江协STM32 05-2 红外传感器计次与旋转编码器计次.md",
     "笔记/STM32/江协科技/05 EXTI外部中断/江协STM32 05-1 EXTI外部中断.md",
     "笔记/STM32/江协科技/05 EXTI外部中断/江协STM32 05 EXTI外部中断（章索引）.md",
     "笔记/STM32/江协科技/05 EXTI外部中断",
-    "笔记/STM32/江协科技/04 OLED/江协STM32 04-2 OLED显示屏.md",
-    "笔记/STM32/江协科技/04 OLED/江协STM32 04-1 OLED调试工具.md",
-    "笔记/STM32/江协科技/04 OLED/江协STM32 04 OLED（章索引）.md",
     "笔记/STM32/江协科技/04 OLED",
-    "笔记/STM32/江协科技/03 GPIO/江协STM32 03-4 按键控制LED与光敏传感器.md",
-    "笔记/STM32/江协科技/03 GPIO/江协STM32 03-3 GPIO输入.md",
-    "笔记/STM32/江协科技/03 GPIO/江协STM32 03-2 LED闪烁与流水灯与蜂鸣器.md",
-    "笔记/STM32/江协科技/03 GPIO/江协STM32 03-1 GPIO输出.md",
-    "笔记/STM32/江协科技/03 GPIO/江协STM32 03 GPIO（章索引）.md",
     "笔记/STM32/江协科技/03 GPIO",
     "笔记/STM32/江协科技/02 开发环境搭建/江协STM32 02 开发环境搭建（章索引）.md",
     "笔记/STM32/江协科技/02 开发环境搭建",
