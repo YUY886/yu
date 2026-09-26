@@ -10,6 +10,7 @@ tags:
   - 输入捕获
   - 主从触发模式
 status: draft
+verify: 官方源码+接线图+课件
 updated: 2026-09-26
 ---
 
@@ -331,6 +332,9 @@ TIM_SelectSlaveMode(TIMx, TIM_SlaveMode_Reset);
   主循环里读：  FX = FC / TIM_GetCapture1(TIM3)
 ```
 
+> [!note] 下一集（6-6）官方代码里这一行多了个 +1
+> 官方 `6-6 输入捕获模式测频率\Hardware\IC.c` 与 `6-7 PWMI模式测频率占空比\Hardware\IC.c` 里，频率读数是 `return 1000000 / (TIM_GetCapture1(TIM3) + 1);`（老师注释：「测周法得到频率fx = fc / N，这里不执行+1的操作也可」）。本页画的是原理骨架，所以写成 `FC / CCR1`；**具体写法与来由见 [[江协STM32 06-6 输入捕获测频率与占空比]] 第 1.2 / 1.3 节**。
+
 **读图要点**：
 
 - CNT 是唯一的「时间标尺」，被 PSC 降速后每个节拍有固定的时间长度。
@@ -366,12 +370,40 @@ TIM_SelectSlaveMode(TIMx, TIM_SlaveMode_Reset);
 
 ## 8 待核对
 
-- [ ] 视频里输入捕获通道电路的画面讲解顺序，以及是否现场讲了三相无刷电机的异或门用途（本页这部分依据公开讲义补充）。
-- [ ] 视频中 `TIM_ICFilter` 取值的具体讲解（公开代码里见到 `0xF`，是否为课堂统一取值需核对）。
-- [ ] 中介频率 `FM` 在视频中给出的具体数值，以及老师选取的 `FC` 与 `t`。
+- [ ] 视频里输入捕获通道电路的画面讲解顺序，以及是否现场讲了三相无刷电机的异或门用途（本页这部分依据课件框图与公开讲义补充，视频画面未逐帧核对）。
+- [ ] 老师对 `TIM_ICFilter = 0xF`（官方源码取值）为什么取最大滤波的**口头解释**。
+- [ ] 中介频率 `FM` 在视频中给出的**具体数值**，以及老师选取的 `FC` 与 `t`（课件《频率测量》页只给了符号 `T`、`fc`、`fm`，没有数值）。
 - [ ] 捕获事件输出到中断 / DMA 那条路径在画面里讲到了什么程度。
-- [ ] 视频里 `TIM_SelectMasterSlaveMode()` 是否被调用：公开转载的代码有的带这一行，有的不带；本页按最小配置（不带）整理。
+
+## 核对记录（2026-09-26）
+
+> [!success] 核对依据
+> - **官方配套源码**（最高优先）：`C:\Users\陈杰裕\Desktop\资料\STM32入门教程资料\程序源码\程序源码\STM32Project-有注释版\`
+>   - `6-6 输入捕获模式测频率\Hardware\IC.c`、`IC.h`、`User\main.c`（本集是理论集，无独立工程；6-5 讲的配置骨架就落在这份 `IC.c` 里）
+>   - `6-7 PWMI模式测频率占空比\Hardware\IC.c`、`Hardware\PWM.c`（用于确认 PWMI 的通道分工）
+> - **官方接线图**：`ground-truth\接线图\6-6 输入捕获模式测频率.png`、`6-7 PWMI模式测频率占空比.png`
+> - **课件文本**：`ground-truth\课件文本.md`（Slide 74 输入捕获简介、Slide 75 频率测量、Slide 76 输入捕获通道、Slide 77 主从触发模式、Slide 78 输入捕获基本结构）
+> - **引脚定义表**：`ground-truth\F103C8T6引脚定义_缩略.png`（PA6 = TIM3_CH1）
+> - **标准外设库**：`6-7 …\Library\stm32f10x_tim.h`、`stm32f10x_tim.c`
+
+| 核对项 | 笔记原值 | 官方依据 | 结论 |
+| --- | --- | --- | --- |
+| IC 一句话定义 | 「通道输入引脚出现指定电平跳变时，当前 CNT 的值将被锁存到 CCR 中」 | 课件 Slide 74 逐字同义：「输入捕获模式下，当通道输入引脚出现指定电平跳变时，当前 CNT 的值将被锁存到 CCR 中」 | 一致 |
+| 输入捕获通道数量 | 每个高级/通用定时器 4 个通道 | 课件 Slide 74：「每个高级定时器和通用定时器都拥有 4 个输入捕获通道」 | 一致 |
+| PWMI 说法 | 「可配置为 PWMI 模式，同时测频率和占空比」 | 课件 Slide 74 原文同义 | 一致 |
+| 测频法 / 测周法公式与取舍 | `FX = n/t` 与 `FX = FC/n`，测频法适合高频、测周法适合低频 | 课件 Slide 75《频率测量》给出 `T`、`fc`、`fm` 与两法定义；「中界频率：测频法与测周法误差相等的频率点」 | 一致 |
+| 主从触发模式框图标注 | 主模式 TRGO、从模式 TRGI、触发源 `ITR0~3 / TI1F_ED / TI1FP1 / TI2FP2 / ETRF`、从模式 `Reset/Gated/Trigger/External1` | 课件 Slide 77《主从触发模式》逐项同 | 一致 |
+| 输入捕获基本结构（上升沿分叉：捕获 + 复位） | 「CCR1 = CNT / CNT = 0」两条线 | 课件 Slide 78《输入捕获 基本结构》标注 `CCR1 = CNT`、`CNT = 0`、`CNT ++` | 一致 |
+| 配置骨架 ③~⑦ 步 | `TIM_InternalClockConfig`、`TIM_TimeBaseInit`、`TIM_ICInit`、`TIM_SelectInputTrigger(…, TIM_TS_TI1FP1)`、`TIM_SelectSlaveMode(…, TIM_SlaveMode_Reset)` | 6-6 `IC.c`（第 22、31、40、43、44 行）逐行同 | 一致 |
+| 捕获引脚 | PA6 → TIM3_CH1 | 6-6 `IC.c`：`GPIO_Pin_6`；引脚定义表 PA6 = TIM3_CH1；接线图同 | 一致 |
+| `TIM_ICFilter` 取值 | 「公开代码里见到 `0xF`，是否为课堂统一取值需核对」 | 6-6/6-7/6-8 官方 `IC.c` / `Encoder.c` 全部写 `TIM_ICFilter = 0xF` | 一致（已由官方源码核实为 `0xF`） |
+| 测周法读数里的「+1」 | 正文骨架写 `FX = FC / TIM_GetCapture1(TIM3)`（无 +1），未标注官方写法 | 6-6/6-7 `IC.c`：`return 1000000 / (TIM_GetCapture1(TIM3) + 1);` | 已修正（原为只写 `FC / CCR1` 且未说明；现补注官方 `+1` 原文并指向 6-6 第 1.2/1.3 节） |
+| `TIM_SelectMasterSlaveMode()` | 「是否被调用：公开转载的代码有的带这一行，有的不带；本页按最小配置（不带）整理」 | 6-6/6-7 官方 `IC.c` 全文均**无**此调用（`stm32f10x_tim.h` 第 1124 行该函数存在，本集未用） | 一致（原按「不带」整理是对的，现已由官方源码确认，该条从待核对移除） |
+| 库函数与枚举名 | `TIM_ICPolarity_Rising/Falling`、`TIM_ICPSC_DIV1`、`TIM_ICSelection_DirectTI/IndirectTI`、`TIM_TS_TI1FP1`、`TIM_SlaveMode_Reset/Gated/Trigger/External1`、`TIM_ICFilter`、`TIM_ClockDivision`/`TIM_CKD_DIV1` | `stm32f10x_tim.h` 第 349~938 行逐一命中；`TIM_SlaveMode_*` 四个宏名与含义（Reset/Gated/Trigger/External1）同 | 一致 |
+| 寄存器位名（CCMR.ICF、CCER.CCxP、CCMR.CCxS、CCMR.ICxPSC、SR.CCxIF） | 见 3.2~3.6 节 | 课件只给框图级标注，未列位名；这些位名属参考手册 RM0008 范畴，本页未用官方 PDF 逐位核对 | 一致（未能用本批依据进一步核对，保持原样） |
+| 采样频率 `f_DTS = CK_INT / CKD` | 3.2 节表述 | `stm32f10x_tim.h` 中 `TIM_CKD_DIV1/2/4` 存在（第 349~351 行）；`f_DTS` 具体定义属 RM0008，本批未核 | 一致（保持原样） |
 
 > [!note] 出处说明
-> 本页 IC 定义、测频法/测周法对比、中介频率推导、输入捕获通道四级电路、主从触发模式与测周法配置骨架，依据课程公开目录、配套讲义与公开转载的示例代码整理，并参考了公开的输入捕获原理讲解资料（含铁头山羊版输入捕获解析）。
-> **未逐帧核对视频画面**，引脚号、寄存器位名以 STM32F10x 参考手册为准，库函数名以标准外设库 V3.5.0 为准；若与视频有出入，以视频为准。
+> 本页的 IC 定义、测频法/测周法对比、中界频率推导、输入捕获通道电路、主从触发模式与测周法配置骨架，已对照**课件文本**（Slide 74《输入捕获简介》、Slide 75《频率测量》、Slide 76《输入捕获通道》、Slide 77《主从触发模式》、Slide 78《输入捕获 基本结构》）、**官方配套源码**（`6-6 输入捕获模式测频率\Hardware\IC.c`、`6-7 PWMI模式测频率占空比\Hardware\IC.c`/`PWM.c`）、**官方接线图**（`6-6 输入捕获模式测频率.png`）、**F103C8T6 引脚定义表**与 **ST 标准外设库 V3.5.0 的 `stm32f10x_tim.h`** 逐条核对；库函数名与枚举名已全部在该头文件中命中。
+> **仍未核实的是**：老师的口头原话与板书数字（中界频率 `FM` 的具体取值、`FC` 与闸门时间 `t` 的选取）、输入捕获通道电路的逐块画面讲解顺序、是否现场讲了三相无刷电机异或门、`TIM_ICFilter = 0xF` 的口头解释、中断/DMA 那条路径讲到什么程度。以上条目见 `## 待核对`。
+> 寄存器位名（`CCMR.ICF`、`CCER.CCxP`、`CCMR.CCxS`、`CCMR.ICxPSC`、`SR.CCxIF`）与 `f_DTS = CK_INT / CKD` 的定义属 RM0008 范畴，本批依据未覆盖，保持原样未改。

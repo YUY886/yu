@@ -11,6 +11,7 @@ tags:
   - NVIC
   - 索引
 status: draft
+verify: 官方源码+接线图+课件
 updated: 2026-09-26
 ---
 
@@ -122,5 +123,29 @@ Cortex-M3 给每个中断留了 **4 个 bit** 的优先级位，`NVIC_PriorityGr
 - 下一章：[[江协STM32 06 TIM定时器（章索引）]] —— 直接复用本章的 NVIC 与中断服务函数写法
 - 课程主页：<https://www.bilibili.com/video/BV1th411z7sn>
 
+## 核对记录（2026-09-26）
+
+> [!success] 核对依据
+> - 官方配套源码：`5-1 对射式红外传感器计次\Hardware\CountSensor.c`、`5-1 对射式红外传感器计次\User\main.c`、`5-2 旋转编码器计次\Hardware\Encoder.c`、`5-2 旋转编码器计次\User\main.c`（`C:\Users\陈杰裕\Desktop\资料\STM32入门教程资料\程序源码\程序源码\STM32Project-有注释版\`）
+> - 官方接线图：`5-1 对射式红外传感器计次.png`、`5-2 旋转编码器计次.png`（`D:\deepseekwork\ground-truth\接线图\`）
+> - 课件文本：`课件文本.md` Slide 41 ~ Slide 52（`D:\deepseekwork\ground-truth\课件文本.md`）
+> - 固件库头文件：`misc.h`、`stm32f10x_exti.h`、`stm32f10x_gpio.h`；`stm32f10x.h` 的 `IRQn_Type` 枚举（STM32F10x_StdPeriph_Lib_V3.5.0）
+> - 引脚定义表：`F103C8T6引脚定义_缩略.png`
+
+| 核对项 | 笔记原值 | 官方依据 | 结论 |
+| --- | --- | --- | --- |
+| NVIC 五种优先级分组表（分组 0~4 的位数与取值） | 分组 0：0+4 位，响应 0~15；分组 1：1+3 位；分组 2：2+2 位；分组 3：3+1 位；分组 4：4+0 位 | 课件 Slide 45 逐行列出同一张表 | 一致 |
+| 分组库函数宏名 | `NVIC_PriorityGroup_0` ~ `NVIC_PriorityGroup_4` | `misc.h` 第 141~149 行同一组宏 | 一致 |
+| 「优先级由 4 位决定」 | 4 个 bit 切给抢占/响应 | 课件 Slide 45：「中断优先级由优先级寄存器的 4 位（0~15）决定」 | 一致 |
+| 中断嵌套与抢占/响应语义 | 抢占高的可打断低的，响应只在同时到达时排队 | 课件 Slide 45：「抢占优先级高的可以中断嵌套，响应优先级高的可以优先排队」 | 一致 |
+| 分组只能设置一次、惯例写在 `main()` | 在 `main()` 开头调用一次 | 源码注释：「此分组配置在整个工程中仅需调用一次」「可以把此代码放在 main 函数内，while 循环之前」；`CountSensor.c` / `Encoder.c` 实际写在各自 `Init()` 内 | 一致 |
+| EXTI 库函数共 8 个及各自用途 | `EXTI_DeInit` / `EXTI_Init` / `EXTI_StructInit` / `EXTI_GenerateSWInterrupt` / `EXTI_GetFlagStatus` / `EXTI_ClearFlag` / `EXTI_GetITStatus` / `EXTI_ClearITPendingBit` | `stm32f10x_exti.h` 第 161~165 行等，恰为这 8 个 | 一致 |
+| AFIO 函数写在 `stm32f10x_gpio.c` 里 | `GPIO_EXTILineConfig()` 名字里没有 AFIO 却在配置 AFIO | `stm32f10x_gpio.c` 中确有 `void GPIO_EXTILineConfig(uint8_t, uint8_t)` | 一致 |
+| EXTI 触发方式 | 上升沿 / 下降沿 / 双边沿 / 软件触发 | 课件 Slide 46 同 | 一致 |
+| 红外传感器引脚 | 章内未写 | 官方源码 + 接线图：红外 **PB14**（`EXTI_Line14`、`EXTI15_10_IRQn`）——详见 05-2 笔记 | 一致 |
+| 编码器引脚 | 章内未写 | 官方源码：编码器两相接 **PB0 / PB1**（`EXTI_Line0 \| EXTI_Line1`）；接线图：编码器 **A 端脚 → B1**、**B 端脚 → B0**——详见 05-2 笔记 | 一致 |
+| 第 6 章定时中断「NVIC 写法完全相同」 | `NVIC_PriorityGroupConfig()` + `NVIC_Init()` | 课件 Slide 57 定时中断基本结构图里 NVIC 同级串联，未给出反例 | 一致 |
+
 > [!note] 出处说明
-> 本页覆盖的视频标题、页码与时长来自 B 站视频分 P 列表；分组表、EXTI 库函数表依据 STM32F10x 标准外设库头文件（`misc.h`、`stm32f10x_exti.h`）与课程配套源码整理。**未逐帧核对视频画面**，若与视频有出入以视频为准；每篇分集笔记末尾附有「待核对」清单。
+> 已对照**官方配套源码、官方接线图、课程课件文本、STM32F10x 标准外设库 V3.5.0 头文件与引脚定义表**逐项核对。
+> 仍未核实的只有两类：① 视频里老师的口头表述与画面演示方式（本页无逐帧记录）；② B 站分 P 的标题、页码与时长（未回源核对分 P 列表）。

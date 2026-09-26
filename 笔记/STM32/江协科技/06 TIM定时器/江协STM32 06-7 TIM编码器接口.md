@@ -10,6 +10,7 @@ tags:
   - 编码器接口
   - 正交编码器
 status: draft
+verify: 官方源码+接线图+课件
 updated: 2026-09-26
 ---
 
@@ -104,6 +105,9 @@ TI2  模式：  只看 B 相的两次跳变        → 每周期 +2
 TI12 模式：  A、B 四个跳变全看          → 每周期 +4   ← 分辨率最高，本课程用这个
 ```
 
+> [!note] 「倍频」这个词是标准库/参考手册口径，课件里没有
+> 课件 Slide 83《工作模式》与 Slide 84/85《实例（均不反相）》《实例（TI1 反相）》**只给了模式名与实例波形，没有出现「倍频」「线数」「PPR」这些术语**（已 grep 全 207 页课件文本确认）。「2 倍频 / 4 倍频」的说法来自标准库对 `TIM_EncoderMode_*` 的说明——`stm32f10x_tim.c` 第 1250~1252 行：`TIM_EncoderMode_TI1: Counter counts on TI1FP1 edge depending on TI2FP2 level.`、`TI2: … on TI2FP2 edge depending on TI1FP1 level.`、`TI12: … on both TI1FP1 and TI2FP2 edges…`。本表是据此整理的**补充**，不是课件原文。
+
 > [!warning] 为什么没有「一倍频」
 > 编码器模式下边沿检测器**上升沿和下降沿都有效**（这是它的设计前提，见下一节），所以只要是它管的通道，一次跳变就一定会被数到，最少也是 2 倍频。想要"只数 A 相上升沿"的 1 倍频，库里没有对应模式，得自己用外部中断或输入捕获实现。
 >
@@ -142,6 +146,14 @@ TI12 模式：  A、B 四个跳变全看          → 每周期 +4   ← 分辨�
 | B（TI2）下降沿 | A（TI1）= 低 | 正转 | **+1** |
 
 用第 2 节的两张波形图代入验算：正转时，A 的上升沿、A 的下降沿、B 的上升沿、B 的下降沿**四处都判为 +1**，一个周期净增 4；反转时四处都判为 −1，一个周期净减 4。表是自洽的。
+
+> [!note] 课件上这张表是**两张**分开的
+> 课件 Slide 81《正交编码器》把它拆成「正转」「反转」两张四行表，**行标题只有「边沿」「另一相状态」两列，没有「判定」与「CNT 动作」列**：
+>
+> - 正转：`A 相↑ / B 相低电平`、`A 相↓ / B 相高电平`、`B 相↑ / A 相高电平`、`B 相↓ / A 相低电平`
+> - 反转：`A 相↑ / B 相高电平`、`A 相↓ / B 相低电平`、`B 相↑ / A 相低电平`、`B 相↓ / A 相高电平`
+>
+> 本页把它们合并成一张八行表，并补上「判定 / CNT 动作」两列（+1 / −1）。**这四组对应关系与课件逐字一致**，补出的两列是按波形自洽验算的结果。
 
 - `TIM_EncoderMode_TI1` 模式只用到表格上半部分（A 的两种边沿）；
 - `TIM_EncoderMode_TI2` 模式只用下半部分；
@@ -233,11 +245,13 @@ TIM_ICInit(通道2)  ├─► 必须先做
 TIM_EncoderInterfaceConfig(...)  ─► 必须后做
 ```
 
-原因：`TIM_EncoderInterfaceConfig()` 内部也会去写两个通道的**极性**位。如果先调它、再调 `TIM_ICInit`，`TIM_ICInit` 会把极性又覆盖回去，**反相参数就白设了**。
+原因：`TIM_EncoderInterfaceConfig()` 内部会**改写 CCER 里两个通道的极性位（CC1P / CC2P）**。查 `stm32f10x_tim.c` 第 1294~1296 行，它清掉 `TIM_CCER_CC1P | TIM_CCER_CC2P` 后写入传入的两个极性；而 `TIM_ICInit` 也会写对应通道的极性位。所以顺序必须是「先两个 `TIM_ICInit`，后 `TIM_EncoderInterfaceConfig`」，否则**后调的输入捕获会把极性覆盖掉，反相参数就白设了**。
+>
+> 官方 `Encoder.c` 的注释原文：「此函数必须在输入捕获初始化之后进行，否则输入捕获的配置会覆盖此函数的部分配置」。注意被覆盖的**只是极性位**，滤波器（`TIM_ICFilter`）由 `TIM_ICInit` 写进 CCMR 的 ICF 位，`TIM_EncoderInterfaceConfig` 不碰它。
 
 ## 7 完整代码
 
-### 7.1 Encoder.c
+### 7.1 Encoder.c（官方 `6-8 编码器接口测速\Hardware\Encoder.c` 原文）
 
 ```c
 #include "stm32f10x.h"
@@ -246,66 +260,70 @@ TIM_EncoderInterfaceConfig(...)  ─► 必须后做
   * 函    数：编码器初始化
   * 参    数：无
   * 返 回 值：无
-  * 说    明：TIM3 的 CH1 / CH2 对应 PA6 / PA7，接入增量（正交）编码器的 A / B 相
   */
 void Encoder_Init(void)
 {
-	/* ① 开启时钟：TIM 外设和 GPIO 外设的时钟都要开 */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);			//开启TIM3的时钟（TIM3挂APB1）
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);			//开启GPIOA的时钟（GPIO挂APB2）
-
-	/* ② GPIO初始化：PA6、PA7 配成上拉输入，与编码器空闲时的默认高电平保持一致 */
+	/*开启时钟*/
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);			//开启TIM3的时钟
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);			//开启GPIOA的时钟
+	
+	/*GPIO初始化*/
 	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;					//上拉输入，空闲默认为高电平
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;			//PA6 = TIM3_CH1，PA7 = TIM3_CH2
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;				//输入模式下速度参数无实际作用，填上只为参数完整
-	GPIO_Init(GPIOA, &GPIO_InitStructure);							//将PA6、PA7初始化为上拉输入
-
-	/* ③ 配置时基单元：PSC不分频，ARR给最大，让CNT尽量慢地溢出 */
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
-	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;		//时钟分频，只影响滤波器采样时钟，与时基无关
-	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;	//计数方向：编码器模式下此参数不起作用，编码器托管
-	TIM_TimeBaseInitStructure.TIM_Period = 65535;					//ARR，给最大值（等价于 65536 - 1）
-	TIM_TimeBaseInitStructure.TIM_Prescaler = 1 - 1;				//PSC，写 1 - 1 即不分频，编码器每来一个边沿CNT就走一格
-	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0;			//重复计数器，只有高级定时器才用得到
-	TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);				//配置TIM3的时基单元
-
-	/* ④ 输入捕获初始化：这里只需要滤波器和通道号，预分频/直连交叉等参数编码器模式用不到 */
-	TIM_ICInitTypeDef TIM_ICInitStructure;							//定义输入捕获结构体变量
-	TIM_ICStructInit(&TIM_ICInitStructure);							//先给结构体所有成员赋默认值，避免初值不确定
-	TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;				//选择通道1（TI1 / A相）
-	TIM_ICInitStructure.TIM_ICFilter = 0xF;							//输入滤波器，0xF为最大滤波，过滤信号抖动
-	TIM_ICInit(TIM3, &TIM_ICInitStructure);							//配置TIM3的通道1
-	TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;				//选择通道2（TI2 / B相）
-	TIM_ICInitStructure.TIM_ICFilter = 0xF;							//输入滤波器，同样给最大滤波
-	TIM_ICInit(TIM3, &TIM_ICInitStructure);							//配置TIM3的通道2
-
-	/* ⑤ 编码器接口配置：模式选4倍频TI12，两个通道均不反相 */
-	TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI12,			//TI12：A、B两相的4个边沿全部计数，即4倍频
-	                           TIM_ICPolarity_Rising,				//TI1极性：Rising表示信号直通，高低电平不反相
-	                           TIM_ICPolarity_Rising);				//TI2极性：同上
-																	//注意：此时的Rising/Falling不再代表上升沿/下降沿，而是代表是否反相
-																	//此函数必须在TIM_ICInit之后调用，否则极性配置会被输入捕获覆盖
-
-	/* ⑥ 启动计数器：不调用这句，CNT一动不动 */
-	TIM_Cmd(TIM3, ENABLE);											//使能TIM3，开始计数
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);							//将PA6和PA7引脚初始化为上拉输入
+	
+	/*时基单元初始化*/
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;				//定义结构体变量
+	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;     //时钟分频，选择不分频，此参数用于配置滤波器时钟，不影响时基单元功能
+	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; //计数器模式，选择向上计数
+	TIM_TimeBaseInitStructure.TIM_Period = 65536 - 1;               //计数周期，即ARR的值
+	TIM_TimeBaseInitStructure.TIM_Prescaler = 1 - 1;                //预分频器，即PSC的值
+	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0;            //重复计数器，高级定时器才会用到
+	TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);             //将结构体变量交给TIM_TimeBaseInit，配置TIM3的时基单元
+	
+	/*输入捕获初始化*/
+	TIM_ICInitTypeDef TIM_ICInitStructure;							//定义结构体变量
+	TIM_ICStructInit(&TIM_ICInitStructure);							//结构体初始化，若结构体没有完整赋值
+																	//则最好执行此函数，给结构体所有成员都赋一个默认值
+																	//避免结构体初值不确定的问题
+	TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;				//选择配置定时器通道1
+	TIM_ICInitStructure.TIM_ICFilter = 0xF;							//输入滤波器参数，可以过滤信号抖动
+	TIM_ICInit(TIM3, &TIM_ICInitStructure);							//将结构体变量交给TIM_ICInit，配置TIM3的输入捕获通道
+	TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;				//选择配置定时器通道2
+	TIM_ICInitStructure.TIM_ICFilter = 0xF;							//输入滤波器参数，可以过滤信号抖动
+	TIM_ICInit(TIM3, &TIM_ICInitStructure);							//将结构体变量交给TIM_ICInit，配置TIM3的输入捕获通道
+	
+	/*编码器接口配置*/
+	TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
+																	//配置编码器模式以及两个输入通道是否反相
+																	//注意此时参数的Rising和Falling已经不代表上升沿和下降沿了，而是代表是否反相
+																	//此函数必须在输入捕获初始化之后进行，否则输入捕获的配置会覆盖此函数的部分配置
+	
+	/*TIM使能*/
+	TIM_Cmd(TIM3, ENABLE);			//使能TIM3，定时器开始运行
 }
 
 /**
   * 函    数：获取编码器的增量值
   * 参    数：无
-  * 返 回 值：自上次调用此函数后，编码器产生的带符号增量
-  * 说    明：读CNT后立即清零，因此返回值就是"这一段时间内转过的格数"
+  * 返 回 值：自上此调用此函数后，编码器的增量值
   */
 int16_t Encoder_Get(void)
 {
-	/* 用Temp作为中继，目的是先取出CNT的值，再把它清零 */
+	/*使用Temp变量作为中继，目的是返回CNT后将其清零*/
 	int16_t Temp;
-	Temp = TIM_GetCounter(TIM3);									//读出CNT。强转int16_t后，反转时0往下数会变成负数
-	TIM_SetCounter(TIM3, 0);										//把CNT清零，下次读到的就是新的增量
-	return Temp;													//返回带符号的增量
+	Temp = TIM_GetCounter(TIM3);
+	TIM_SetCounter(TIM3, 0);
+	return Temp;
 }
 ```
+
+> [!note] 与上一版的差异（逐条）
+> - `TIM_Period`：`65535` → **`65536 - 1`**（官方原文，与 6-6/6-7 的 `IC.c` 写法一致；两者等值）。
+> - `Encoder_Get()` 的注释文字改为官方原文（上一版自行扩写了注释）。
+> - `Encoder_Init()` 的步骤注释改为官方原文逐行对齐。
 
 ### 7.2 Encoder.h
 
@@ -319,36 +337,50 @@ int16_t Encoder_Get(void);
 #endif
 ```
 
-> [!note] `Encoder_Get()` 属于下一集
-> 本集（6-7）讲的是**编码器接口本身**：转一格 CNT 走一格。要测**位置**，直接读 CNT 就行，不需要清零。
+> [!note] `Encoder_Get()` 属于 6-8
+> 6-7 是**理论集，官方没有独立工程**；`Encoder_Get()` 与 `Encoder_Init()` 一起出现在 **`6-8 编码器接口测速`** 的 `Hardware\Encoder.c` 里，且 `6-8` 是**唯一**的编码器工程。
 >
-> `Encoder_Get()` 是 6-8 讲**测速**时才需要的东西——因为测速要的是"固定时间内的增量"，读完必须清零。这里先把它一并放进文件里，6-8 直接复用。
+> 本集讲的是**编码器接口本身**：转一格 CNT 走一格。要测**位置**，直接读 CNT 就行，不需要清零。
+> `Encoder_Get()` 是**测速**时才需要的东西——因为测速要的是「固定时间内的增量」，读完必须清零。这里先把它一并列在文件里，6-8 直接复用。
 
-### 7.3 main.c（测位置：直接读 CNT，不清零）
+### 7.3 main.c（官方 `6-8 编码器接口测速\User\main.c` 原文）
+
+官方工程里这一集**没有独立的 6-7 工程**（6-7 是理论集），编码器接口的代码落在 `6-8 编码器接口测速` 里，而且**直接就是测速的写法**：用 TIM2 定时中断每 1 秒取一次 `Encoder_Get()`。如果想只测位置、不清零，把那一行换成直接读 CNT 即可（见下方第二段代码）。
 
 ```c
-#include "stm32f10x.h"
+#include "stm32f10x.h"                  // Device header
+#include "Delay.h"
 #include "OLED.h"
+#include "Timer.h"
 #include "Encoder.h"
+
+int16_t Speed;			//定义速度变量
 
 int main(void)
 {
-	/* 模块初始化 */
-	OLED_Init();													//OLED初始化
-	Encoder_Init();													//编码器接口初始化
-
-	/* 显示静态字符串 */
-	OLED_ShowString(1, 1, "CNT:");									//第1行第1列显示"CNT:"
-
+	/*模块初始化*/
+	OLED_Init();		//OLED初始化
+	Timer_Init();		//定时器初始化
+	Encoder_Init();		//编码器初始化
+	
+	/*显示静态字符串*/
+	OLED_ShowString(1, 1, "Speed:");		//1行1列显示字符串Speed:
+	
 	while (1)
 	{
-		/* 测位置：直接读CNT即可，绝对不要把CNT清零，否则绝对位置就丢了 */
-		OLED_ShowSignedNum(1, 5, (int16_t)TIM_GetCounter(TIM3), 5);	//强转int16_t，反转时才能显示出负值
+		OLED_ShowSignedNum(1, 7, Speed, 5);	//不断刷新显示编码器测得的最新速度
 	}
 }
 ```
 
-现象：**正转数值自增，反转数值自减**，转得越快涨得越快，停下不动数值就定住不动。转动一格，数值变化 4（因为用的是 4 倍频的 TI12 模式）。
+> [!note] 想只测位置（读 CNT、不清零）
+> 官方代码里没有「测位置」的版本，下面这段是按 6-8 的思路改写的对照写法，**不是官方原文**：把中断里那一行换成直接读 CNT，并去掉 `Encoder_Get()` 的清零动作。
+>
+> ```c
+> OLED_ShowSignedNum(1, 5, (int16_t)TIM_GetCounter(TIM3), 5);	//反复读CNT，绝不清零
+> ```
+>
+> 现象：正转数值自增、反转数值自减；转动一格数值变化 **4**（TI12 = 4 倍频）。这个「4」是由模式决定的，课件没有给出「倍频」这一术语，属标准库/参考手册口径。
 
 ## 8 易错点
 
@@ -357,7 +389,7 @@ int main(void)
 - [ ] **GPIO 配成了输出模式**（推挽/开漏）→ 引脚自己驱动电平，和编码器输出打架，读数乱跳。必须是**输入**模式。
 - [ ] **忘记 `TIM_Cmd()`** → CNT 一动不动，读出来一直是 0。
 - [ ] **PSC 忘了写 `1 - 1`** → 计数时钟被分频，转一格 CNT 不再走一格，测出来的位置和速度整体偏小。
-- [ ] **返回类型写成 `uint16_t`** → 反转时看到的是 65535 附近的大数，而不是 `−1`。详见 6-8。
+- [ ] **返回类型写成 `uint16_t`** → 反转时看到的是 65535 附近的大数，而不是 `−1`。官方 `Encoder_Get()` 返回的是 `int16_t`，详见 6-8。
 - [ ] **拿 TIM6 / TIM7（基本定时器）做编码器接口** → 没有这个硬件模块，配了也没反应。
 - [ ] **拿 CH3 / CH4 去接编码器** → 编码器接口只用 CH1 和 CH2，CH3/CH4 接上去无效。
 - [ ] **想在编码器模式下改计数方向**（改 `TIM_CounterMode_Up`）→ 方向由编码器托管，这个参数不起作用。要反转方向只能反相一相，或者把 A/B 接线对调。
@@ -383,14 +415,48 @@ int main(void)
 
 ## 10 待核对
 
-- [ ] 视频里编码器接口框图（输入部分 / 输出部分）的逐块讲解顺序与画面标注。
-- [ ] 视频里"正转 / 反转"两张判决表的原始排版与行标题（本页的真值表依据 RM0008 计数方向表整理并做过自洽验算）。
-- [ ] 6-7 例程 main.c 的确切写法：是直接读 CNT，还是已经用了 `Encoder_Get()`。
-- [ ] `Encoder_Get()` 究竟在 6-7 还是 6-8 才引入（本页按"6-8 引入"处理，但为文件完整先在 6-7 给出）。
-- [ ] 视频是否单独讨论过"一倍频"及其实现方式。
-- [ ] 例程里 PSC / ARR 的确切写法：本页写 `TIM_Period = 65535`，配套代码里也见过等价的 `65536 - 1`。
+- [ ] 视频里编码器接口框图（输入部分 / 输出部分）的逐块讲解顺序与画面标注（课件 Slide 82《编码器接口 基本结构》只有框图标号）。
+- [ ] 视频里「正转 / 反转」两张判决表的**原始排版与行标题的视觉呈现**（课件 Slide 81 的行列文字已核对，但 PPT 上的箭头/图例符号无法从文本提取）。
+- [ ] 视频是否单独讨论过「一倍频」及其实现方式（课件 Slide 83/84/85 只给模式名与实例波形，未见相关表述）。
+- [ ] 视频里编码器模块 A/B/ VCC/GND 四根线的**插线动作细节**（官方接线图 `6-8 编码器接口测速.png` 上 A、B 两线从编码器模块走向 MCU 板块，缩略图不足以逐孔确认；引脚以官方 `Encoder.c` 的 `GPIO_Pin_6 | GPIO_Pin_7` 为准）。
+
+## 核对记录（2026-09-26）
+
+> [!success] 核对依据
+> - **官方配套源码**（最高优先）：`C:\Users\陈杰裕\Desktop\资料\STM32入门教程资料\程序源码\程序源码\STM32Project-有注释版\`
+>   - `6-8 编码器接口测速\Hardware\Encoder.c`、`Encoder.h`、`User\main.c`、`System\Timer.c`（**6-7 是理论集，官方无独立工程**，编码器代码只在 6-8 里）
+>   - `6-7 PWMI模式测频率占空比\Library\stm32f10x_tim.c`（`TIM_EncoderInterfaceConfig()` 第 1264~1304 行）、`stm32f10x_tim.h`（枚举与函数原型）
+> - **官方接线图**：`ground-truth\接线图\6-8 编码器接口测速.png`
+> - **课件文本**：`ground-truth\课件文本.md`（Slide 80 编码器接口简介、Slide 81 正交编码器、Slide 82 编码器接口基本结构、Slide 83 工作模式、Slide 84/85 实例）
+> - **引脚定义表**：`ground-truth\F103C8T6引脚定义_缩略.png`（PA6 = TIM3_CH1、PA7 = TIM3_CH2；PB4/PB5、PC6/PC7 为重定义）
+
+| 核对项 | 笔记原值 | 官方依据 | 结论 |
+| --- | --- | --- | --- |
+| 「编码器接口 = 自带方向判断的外部计数时钟」 | 位置/方向/速度三量 | 课件 Slide 80 原文：「自动控制 CNT 自增或自减，从而指示编码器的位置、旋转方向和旋转速度」 | 一致 |
+| 编码器类型 | 增量（正交）编码器 | 课件 Slide 80：「可接收增量（正交）编码器的信号」 | 一致 |
+| 每个高级/通用定时器 1 个编码器接口 | 同 | 课件 Slide 80：「每个高级定时器和通用定时器都拥有 1 个编码器接口」 | 一致 |
+| 借用 CH1/CH2 | 同 | 课件 Slide 80：「两个输入引脚借用了输入捕获的通道 1 和通道 2」 | 一致 |
+| A/B 相引脚 | PA6 / PA7 → TIM3_CH1 / CH2 | `Encoder.c`：`GPIO_Pin_6 \| GPIO_Pin_7`；引脚定义表 PA6/PA7 = TIM3_CH1/CH2；接线图同 | 一致 |
+| TIM3 重映射说法 | 「部分重映射 PB4/PB5、完全重映射 PC6/PC7」 | 引脚定义表 PA6/PA7 行的「重定义功能」分别标注 `TIM3_CH1`、`TIM3_CH2`（PB4/PB5、PC6/PC7 行标注为 TIM3_CH1~CH4 的重定义） | 一致 |
+| `TIM_Period` | `65535` | `Encoder.c`：`TIM_TimeBaseInitStructure.TIM_Period = 65536 - 1;` | 已修正（原为 `65535`，现改为官方原文 `65536 - 1`） |
+| `TIM_Prescaler` | `1 - 1` | `Encoder.c`：`TIM_Prescaler = 1 - 1` | 一致 |
+| GPIO 模式 | PA6/PA7 上拉输入 `GPIO_Mode_IPU` | `Encoder.c`：`GPIO_Mode_IPU` + `GPIO_Pin_6 \| GPIO_Pin_7` | 一致 |
+| `TIM_ICStructInit` + 两次 `TIM_ICInit` 的顺序 | 先 `TIM_ICInit`（CH1、CH2），后 `TIM_EncoderInterfaceConfig` | `Encoder.c`：`TIM_ICStructInit` → `TIM_ICInit(CH1, ICF=0xF)` → `TIM_ICInit(CH2, ICF=0xF)` → `TIM_EncoderInterfaceConfig(...)` | 一致 |
+| `TIM_ICFilter` | `0xF`（两个通道） | `Encoder.c`：两次都写 `TIM_ICFilter = 0xF` | 一致 |
+| 编码器模式 | `TIM_EncoderMode_TI12`（TI12，两个通道均不反相） | `Encoder.c`：`TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising)` | 一致 |
+| 「顺序不能颠倒」的原因 | 「`TIM_EncoderInterfaceConfig()` 内部也会写两个通道的极性位」 | `stm32f10x_tim.c` 第 1294~1296 行：清 `TIM_CCER_CC1P \| TIM_CCER_CC2P` 后写入两个极性；官方注释：「此函数必须在输入捕获初始化之后进行，否则输入捕获的配置会覆盖此函数的部分配置」 | 一致（已补注「被覆盖的只是极性位，滤波器不在此列」） |
+| 极性在编码器模式下的含义 | `Rising` = 直通不反相；`Falling` = 经非门反相 | `Encoder.c` 注释：「注意此时参数的Rising和Falling已经不代表上升沿和下降沿了，而是代表是否反相」 | 一致 |
+| 真值表（8 行） | 合并成一张 8 行表，含「判定 / CNT 动作」两列 | 课件 Slide 81 拆成正转/反转两张 4 行表，**只有「边沿」「另一相状态」两列**，8 组对应关系与本页逐条相同 | 一致（8 组对应关系原值正确；已补注课件只有两张 4 行表、本页的判定列是自洽验算补出的） |
+| 反相的效果（4 种配置） | 均不反相=自增/自减；任一相反相=互换；两相都反相=等同不反相 | 课件 Slide 84《实例（均不反相）》、Slide 85《实例（TI1 反相）》两页标题与之一致；`TIM_ICPolarity_BothEdge` 之外的组合在库里都合法 | 一致 |
+| 「2 倍频/4 倍频」「线数 PPR」 | 3 种模式对应 2/2/4 倍频 | 课件全文 **grep 不到「倍频」「线数」「PPR」**；标准库 `stm32f10x_tim.c` 第 1250~1252 行只说明「counts on TI1FP1 edge depending on TI2FP2 level」等 | 一致（原值按标准库口径正确；已补 callout 明确「倍频」不是课件术语，属补充） |
+| `TIM_InternalClockConfig()` 不用调 | 「编码器模式下多余」 | `Encoder.c` 全程**没有**调用 `TIM_InternalClockConfig` | 一致 |
+| main.c 写法 | 「直接读 CNT，用 `OLED_ShowString(1, 1, "CNT:")`」 | 6-8 `main.c`：`OLED_ShowString(1, 1, "Speed:")` + `OLED_ShowSignedNum(1, 7, Speed, 5)`，中断里 `Speed = Encoder_Get()` | 已修正（原为自造的「测位置 main.c」；现改为官方 `main.c` 原文，并把「只读 CNT 测位置」的写法降级为对照补充） |
+| `Encoder_Get()` 出现在哪一集 | 「本页按 6-8 引入处理，但为文件完整先在 6-7 给出」 | 官方只有 `6-8 编码器接口测速\Hardware\Encoder.c` 含此函数；官方无 6-7 工程 | 一致（已由官方源码核实：6-8 引入；该条从待核对移除） |
+| 库函数与枚举名 | `TIM_EncoderMode_TI1/TI2/TI12`、`TIM_ICPolarity_Rising/Falling`、`TIM_EncoderInterfaceConfig`、`TIM_ICInit`、`TIM_ICStructInit`、`TIM_GetCounter`、`TIM_SetCounter`、`GPIO_Mode_IPU/IPD/IN_FLOATING` | `stm32f10x_tim.h` 第 553~938、1060~1140 行逐一命中 | 一致 |
+| 「拿 TIM6/TIM7 做编码器接口」易错点 | 基本定时器没有该模块 | 课件 Slide 215 定时器类型表：基本定时器 TIM6/TIM7 只有「定时中断、主模式触发 DAC」 | 一致 |
 
 > [!note] 出处说明
-> 本页的编码器接口功能描述、工作模式、配置六步、`TIM_EncoderInterfaceConfig()` 参数含义、GPIO 输入模式选择原则与示例代码，依据课程公开目录、配套讲义与示例代码，以及公开学习笔记整理；真值表依据 STM32F103 参考手册的编码器模式计数方向表整理并做过自洽验算。
->
-> **未逐帧核对视频画面**，页码与集数来自 B 站分 P 列表。若与视频有出入，以视频为准。
+> 本页的编码器接口功能描述、正交判决关系、工作模式、配置六步、`TIM_EncoderInterfaceConfig()` 参数含义、GPIO 输入模式选择原则与示例代码，已对照**课件文本**（Slide 80~85）、**官方配套源码**（`6-8 编码器接口测速\Hardware\Encoder.c`、`Encoder.h`、`User\main.c`，以及 `stm32f10x_tim.h` / `stm32f10x_tim.c`）与**官方接线图**（`6-8 编码器接口测速.png`）、**F103C8T6 引脚定义表**逐条核对；真值表的 8 组对应关系与课件 Slide 81 逐条一致，「判定 / CNT 动作」两列按波形自洽验算补出。
+> **仍未核实的是**：编码器接口框图的逐块画面讲解顺序、两张判决表在 PPT 上的视觉排版与箭头图例、「一倍频」是否被讨论、编码器四根线插线动作的逐孔细节。以上条目见 `## 待核对`。
+> 「倍频 / 线数 / PPR」不是课件术语，本页已明确标注为按标准库说明整理的补充口径。
+

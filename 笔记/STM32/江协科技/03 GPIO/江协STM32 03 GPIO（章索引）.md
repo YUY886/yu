@@ -9,6 +9,7 @@ tags:
   - GPIO
   - 索引
 status: draft
+verify: 官方源码+接线图+课件
 updated: 2026-09-26
 ---
 
@@ -116,5 +117,29 @@ GPIOx 挂在 APB2 总线上（GPIOA ~ GPIOG）
 - 上级：[[江协STM32 课程总索引]]
 - 课程主页：<https://www.bilibili.com/video/BV1th411z7sn>
 
+## 核对记录（2026-09-26）
+
+> [!success] 核对依据
+> - 官方源码：`STM32Project-有注释版\3-1 LED闪烁\User\main.c`、`3-2 LED流水灯\User\main.c`、`3-3 蜂鸣器\User\main.c`、`3-4 按键控制LED\Hardware\LED.c`、`Key.c`、`3-5 光敏传感器控制蜂鸣器\Hardware\Buzzer.c`、`LightSensor.c`
+> - 官方接线图：`接线图\3-1 LED闪烁.png`、`3-2 LED流水灯.png`、`3-3 蜂鸣器.png`、`3-4 按键控制LED.png`、`3-5 光敏传感器控制蜂鸣器.png`
+> - 课件文本：`课件文本.md`（Slide 18 GPIO 简介、Slide 21 GPIO 模式表、Slide 26 LED 和蜂鸣器简介）
+> - 固件库头文件：`STM32F10x_StdPeriph_Lib_V3.5.0\...\inc\stm32f10x_gpio.h`
+> - 引脚定义表：`F103C8T6引脚定义_缩略.png`
+
+| 核对项 | 笔记原值 | 官方依据 | 结论 |
+| --- | --- | --- | --- |
+| 八种工作模式名与性质 | 见「本章速查」表 | 课件文本 Slide 21 逐条列出同样 8 种模式与性质/特征 | 一致 |
+| 八种模式库函数枚举值 | `GPIO_Mode_IN_FLOATING`/`IPU`/`IPD`/`AIN`/`Out_OD`/`Out_PP`/`AF_OD`/`AF_PP` | `stm32f10x_gpio.h` 第 72~80 行：`AIN=0x0`、`IN_FLOATING=0x04`、`IPD=0x28`、`IPU=0x48`、`Out_OD=0x14`、`Out_PP=0x10`、`AF_OD=0x1C`、`AF_PP=0x18` | 一致 |
+| 常用库函数表 8 个函数 | `RCC_APB2PeriphClockCmd`、`GPIO_Init`、`GPIO_SetBits`、`GPIO_ResetBits`、`GPIO_WriteBit`、`GPIO_Write`、`GPIO_ReadInputDataBit`、`GPIO_ReadOutputDataBit` | `stm32f10x_gpio.h` 原型区（353~361 行）确认全部存在且签名相符 | 一致 |
+| 引脚配置速记 | GPIO 挂 APB2、16 引脚、速度三档、FT 可接 5V | 课件文本 Slide 18「引脚电平 0V~3.3V，部分引脚可容忍 5V」；引脚定义表 PB12/PB13 等标 FT | 一致 |
+| 3-1 实验引脚 | 未写具体引脚 | 官方 `3-1 LED闪烁\User\main.c`：`GPIO_Pin_0` + `GPIOA` → **PA0** | 一致（本页未涉及） |
+| 3-2 流水灯引脚 | 未写具体引脚 | 官方 `3-2 LED流水灯\User\main.c`：`GPIOA` + `GPIO_Pin_All`，依次拉低 PA0~PA7 | 一致（本页未涉及） |
+| 3-2 蜂鸣器引脚 | 未写具体引脚 | 官方 `3-3 蜂鸣器\User\main.c`：`GPIOB` + `GPIO_Pin_12` → **PB12** | 一致（本页未涉及） |
+| 3-4 按键引脚 | 未写具体引脚 | 官方 `3-4 按键控制LED\Hardware\Key.c`：`GPIOB` + `GPIO_Pin_1 \| GPIO_Pin_11` → **PB1/PB11** | 一致（本页未涉及） |
+| 3-4 LED 引脚 | 未写具体引脚 | 官方 `3-4 按键控制LED\Hardware\LED.c`：`GPIOA` + `GPIO_Pin_1 \| GPIO_Pin_2` → **PA1/PA2** | 一致（本页未涉及） |
+| 3-4 光敏 DO 引脚 | 未写具体引脚 | 官方 `3-5\Hardware\LightSensor.c`：`GPIOB` + `GPIO_Pin_13` → **PB13** | 一致（本页未涉及） |
+| 上拉输入用于「按键另一端接 GND」 | 上拉输入 \| 按键（另一端接 GND） | 官方 `Key.c` 用 `GPIO_Mode_IPU`，接线图 3-4 中按键另一端接 GND 轨 | 一致 |
+| 下拉输入用于「按键另一端接 VCC」 | 下拉输入 \| 按键（另一端接 VCC） | 官方源码中未见该接法的实例（课件与源码只演示了下接按键） | 一致（属通用说明，依据中未见反例） |
+
 > [!note] 出处说明
-> 本页八种模式、寄存器与库函数依据 ST 标准外设库 `stm32f10x_gpio.h` / `stm32f10x_rcc.h` 与课程公开讲义整理；页码与时长来自 B 站视频分 P 列表。未逐帧核对视频画面，若与视频有出入以视频为准。
+> 本页八种模式、寄存器与库函数已对照 **ST 标准外设库 `stm32f10x_gpio.h`**、**官方配套源码（`STM32Project-有注释版\3-1`~`3-5`）**、**官方接线图（`接线图\3-1`~`3-5`）** 与 **课程课件 `课件文本.md`（Slide 18/21/26）** 逐条核对。页码与时长仍来自 B 站视频分 P 列表，**未逐帧核对视频画面**；课件中仅以图片形式给出的「GPIO 位结构」框图和硬件电路图无法从文本提取，相关细节未核实。

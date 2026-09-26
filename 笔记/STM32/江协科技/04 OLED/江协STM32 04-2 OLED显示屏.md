@@ -10,6 +10,7 @@ tags:
   - SSD1306
   - 显示函数
 status: draft
+verify: 官方源码+接线图+课件
 updated: 2026-09-26
 ---
 
@@ -158,7 +159,7 @@ void OLED_SetCursor(uint8_t Y, uint8_t X)
 | `0x00` 按位或列地址低 4 位 | 设置**列地址低 4 位** | 同上 |
 
 > [!note] `OLED_SetCursor` 是"内部函数"
-> 它**没有**出现在 `OLED.h` 里，属于驱动内部使用的函数。日常写代码只需要用第 1 节表格里的 8 个 API，不用直接调它。理解它的意义在于看懂 `OLED_ShowChar()` 是怎么定位的。
+> 它**没有**出现在 `OLED.h` 里，属于驱动内部使用的函数（官方 `OLED.h` 只声明了 8 个显示函数）。日常写代码只需要用第 1 节表格里的 8 个 API，不用直接调它。理解它的意义在于看懂 `OLED_ShowChar()` 是怎么定位的。
 
 ### 3.3 一个字符是怎么画出来的
 
@@ -322,6 +323,10 @@ else
 | 中英混排 | 只支持 ASCII | V2.0 起 `OLED_ShowString` / `OLED_Printf` 支持 |
 | 字符集 | 固定 | `OLED_CHARSET_UTF8` / `OLED_CHARSET_GB2312` 可选 |
 
+> [!warning] 对照表的依据范围
+> **左列「本课程驱动」**已核对本机官方源码：`4-1 OLED显示屏\Hardware\OLED.h` 恰好 8 条声明，`OLED.c` 中**不存在** `OLED_ShowChinese`、`OLED_ShowImage`、`OLED_Printf`、`OLED_GRAM`、`OLED_Update`。
+> **右列「新版驱动」**的依据是江协科技官方驱动页 <https://jiangxiekeji.com/tutorial/oled.html> 的「适用器件 / 程序亮点 / 更新动态」，**本机没有新版驱动的代码**，因此右列的行（除已在该页明确写出的"汉字、图片、绘图""V1.2 坐标改 int16_t""V2.0 删除 OLED_ShowChinese""字符集宏"外）属于**未在官方资料中核实**，请以官方页面与新版代码为准。
+
 **新版驱动的版本演进**（摘自官方页面）：
 
 - `V1.0`（2023.11.22）：首次发布
@@ -423,7 +428,7 @@ while (1)
 - [ ] 在有符号数上少算一列 → `OLED_ShowSignedNum` **自带 `+`/`-` 号**，会比 `Length` 多占 1 列。
 - [ ] 显示变动的数字时 `Length` 写太小 → 位数变多时屏幕残留旧字符。
 - [ ] 上电后没有 `OLED_Init()` 就直接显示 → 命令序列未下发，黑屏或花屏。
-- [ ] 在**课程驱动**里调用 `OLED_Update()` 或 `OLED_ShowChinese()` → 函数不存在，编译报错（那是江协科技新版驱动的 API）。
+- [ ] 在**课程驱动**里调用 `OLED_Update()` 或 `OLED_ShowChinese()` → 函数不存在，编译报错（那是江协科技**新版**驱动的 API）。
 - [ ] 取模软件的**阴码/阳码、逐行/逐列**与驱动取字节方式不匹配 → 显示乱码或上下颠倒，且不报错。
 - [ ] 清屏用 `OLED_Clear()`；想**只覆盖一部分**内容就直接重写那一块，不必每次全屏清（全屏清会造成明显闪烁）。
 
@@ -444,11 +449,51 @@ while (1)
 
 ## 8 待核对
 
-- [ ] **`OLED_Printf`**：本课程驱动中**不存在**此函数（已核对 `OLED.h` 全部 8 个声明）。它在江协科技**新版**驱动中出现——需对照视频确认这一集是否提及。
-- [ ] **`OLED_ShowChinese` / `OLED_ShowImage`**：本课程驱动中**不存在**（新版驱动 V1.x 有、V2.0 又删除了 `OLED_ShowChinese`）。本集视频是否演示汉字/图片显示，需核对。
-- [ ] **取模软件的具体设置组合**（阴码/阳码、逐行式/逐列式、C51 格式的勾选项截图）——未取到可靠文字来源，需逐帧看视频确认。
+- [ ] **取模软件的具体设置组合**（阴码/阳码、逐行式/逐列式、C51 格式的勾选项截图）——官方课件、源码与接线图中均无取模设置说明，需逐帧看视频确认。
 - [ ] 本集视频中 `OLED_ShowChar` / `OLED_ShowNum` 内部实现的讲解详略程度，以及是否现场演示"改字库表"。
 - [ ] 视频里实际演示的例程内容（显示哪些字符串/变量）与本笔记示例可能有出入。
+- [ ] 第 4.1 节对照表**右列「江协科技新版驱动」**的行——新版驱动代码不在本机官方资料中，仅依据官方驱动页描述整理，详见 4.1 的说明框。
+
+## 核对记录（2026-09-26）
+
+> [!success] 核对依据
+> 实际用到的依据（均为本机官方资料）：
+> - **官方源码**：`程序源码\STM32Project-有注释版\4-1 OLED显示屏\Hardware\OLED.c`、`OLED.h`、`OLED_Font.h`；`1-4 OLED驱动函数模块\4针脚I2C版本\OLED.h`、`OLED.c`
+> - **官方接线图**：`ground-truth\接线图\4-1 OLED显示屏.png`（含"OLED 下方被遮住的接线图"小图）
+> - **官方课件**：`ground-truth\课件文本.md`（Slide 38 OLED 简介、Slide 39 硬件电路、Slide 40 驱动函数）
+> - **引脚定义表**：`ground-truth\F103C8T6引脚定义_缩略.png`
+> - **官方驱动页**：<https://jiangxiekeji.com/tutorial/oled.html>
+
+| 核对项 | 笔记原值 | 官方依据 | 结论 |
+| --- | --- | --- | --- |
+| 课程驱动函数总数 | 8 个 | 官方 `OLED.h` 全文 13 行，恰好 8 条函数声明 | 一致 |
+| 8 条函数名与完整原型 | Init/Clear/ShowChar/ShowString/ShowNum/ShowSignedNum/ShowHexNum/ShowBinNum 及参数类型 | `OLED.h` L4~L11 逐字相同 | 一致 |
+| `OLED_ShowChar` 参数范围 | Line 1~4、Column 1~16、ASCII 可见字符 | `OLED.c` L129~L131 函数注释原文 | 一致 |
+| `OLED_ShowString` 参数范围 | Line 1~4、Column 1~16、ASCII 可见字符 | `OLED.c` L151~L153 函数注释原文 | 一致 |
+| `OLED_ShowNum` 数值范围 / `Length` | 0~4294967295 / 1~10 | `OLED.c` L183~L184 函数注释原文 | 一致 |
+| `OLED_ShowSignedNum` 数值范围 / `Length` | −2147483648~2147483647 / 1~10 | `OLED.c` L200~L201 函数注释原文 | 一致 |
+| `OLED_ShowHexNum` 数值范围 / `Length` | 0~0xFFFFFFFF / 1~8 | `OLED.c` L228~L229 函数注释原文 | 一致 |
+| `OLED_ShowBinNum` 数值范围 / `Length` | 0~1111 1111 1111 1111 / 1~16 | `OLED.c` L253~L254 函数注释原文 | 一致 |
+| 是否存在 `OLED_Printf` | 不存在（原记为"待核对"） | `4-1` 与 `1-4` 两个版本的 `OLED.h`、`OLED.c` 全文均无 | 一致（该项已核实，从待核对移除） |
+| 是否存在 `OLED_ShowChinese` / `OLED_ShowImage` | 不存在（原记为"待核对"） | 同上，官方源码中均无 | 一致（该项已核实，从待核对移除） |
+| 是否存在显存缓冲区 `OLED_GRAM` / `OLED_Update` | 无，本课程为"直写"模式 | `OLED.c` 全文：`OLED_ShowChar` 内直接 `OLED_WriteData`，无任何缓冲区与刷新函数 | 一致 |
+| `OLED_ShowChar` 实现（分上下半页两次写） | 与笔记代码块一致 | `OLED.c` L134~L147 原文 | 一致 |
+| `OLED_ShowString` 实现（`Column + i`） | 与笔记代码块一致 | `OLED.c` L156~L163 原文 | 一致 |
+| `OLED_ShowNum` 实现（`OLED_Pow(10,…)%10+'0'`） | 与笔记代码块一致 | `OLED.c` L169~L194 原文 | 一致 |
+| `OLED_ShowHexNum` 分支 | `< 10` 用 `+'0'`，否则 `-10+'A'` | `OLED.c` L237~L245 原文 | 一致 |
+| `OLED_SetCursor` 三条命令与位分配 | `0xB0\|Y`、`0x10\|高4位`、`0x00\|低4位` | `OLED.c` L102~L107 原文 | 一致 |
+| `OLED_SetCursor` 未出现在 `OLED.h` | 是"内部函数" | 官方 `OLED.h` 中确无此声明（补充："官方 `OLED.h` 只声明了 8 个显示函数"） | 一致 |
+| 字库名、几何与下标的偏移 | `OLED_F8x16[][16]`，8×16，`Char - ' '` | `OLED_Font.h` L4~L5 注释与声明；`OLED.c` L140、L145 的 `OLED_F8x16[Char - ' '][i]` | 一致 |
+| `Length` 的含义与补零行为 | 占格数，不足左侧补 `0` | `OLED.c` L192 用 `OLED_Pow(10, Length-i-1)` 逐位取数 → 不足即取到 0 | 一致 |
+| 有符号数多占 1 列 | 符号占 `Column`，数字从 `Column + 1` 起 | `OLED.c` L210~L221：先 `OLED_ShowChar(Line, Column, '+')`，再循环 `Column + i + 1` | 一致 |
+| 一行 = 2 页的换算 | `(Line-1)*2` 与 `+1` | `OLED.c` L137、L142 | 一致 |
+| 每列字符宽 8 像素 | `(Column - 1) * 8` | `OLED.c` L137、L142 | 一致 |
+| 字符串越界不报错（`Column + n - 1 ≤ 16`） | 超出屏幕的部分看不见 | `OLED.c` L159~L162 循环不设边界检查 | 一致 |
+| 4 行 × 16 列坐标约定与课件示意 | 1~4 / 1~16，从 1 开始 | 课件 Slide 40 左侧函数表与右侧屏幕示意（列 1~16、行 1~4） | 一致 |
+| 驱动默认引脚（本页未列出，属相邻笔记内容） | 本页未写引脚号 | `4-1 OLED显示屏\Hardware\OLED.c` L5~L6：SCL=PB8、SDA=PB9 | 一致（本页无需改动） |
+| 驱动是"直写"而非"带显存缓冲区 GRAM" | 直写 | `OLED.c` 全文无 GRAM/Update，见上 | 一致 |
+| 新版驱动版本演进（V1.0~V2.0） | V1.0 2023.11.22 / V1.1 2023.12.8 / V1.2 2024.4.24 / V2.0 2024.10.20 | 官方驱动页「更新动态」逐条一致，**但本机无新版驱动代码** | 一致（依据为官方网页，已在 4.1 加说明框） |
 
 > [!note] 出处说明
-> 本页全部函数原型、参数范围、实现代码与字库结构依据课程配套源码（<https://gitee.com/KSweb/stm32f1doc> 的 `oled库/Hardware/OLED.h`、`OLED.c`、`OLED_Font.h`）逐行核对；8 个函数的参数表与 4 行 × 16 列坐标约定同江协科技官方驱动页 <https://jiangxiekeji.com/tutorial/oled.html> 及同课程公开笔记一致；「新版驱动」的 API 差异与版本演进依据官方驱动页的更新动态整理。SSD1306 页/列寻址依据其公开数据手册。**未逐帧核对视频画面**，若与视频有出入以视频为准。
+> 本页全部函数原型、参数范围、实现代码与字库结构，已逐行对照**官方配套源码** `程序源码\STM32Project-有注释版\4-1 OLED显示屏\Hardware\OLED.h`、`OLED.c`、`OLED_Font.h`（8 条声明的原文、`OLED_SetCursor` 的三条命令、`OLED_ShowChar/ShowString/ShowNum/ShowSignedNum/ShowHexNum/ShowBinNum` 实现、`OLED_F8x16[][16]` 字库结构与 `Char - ' '` 寻址）；「8 个函数」的结论同时与 `1-4 OLED驱动函数模块\4针脚I2C版本\OLED.h` 一致；4 行 × 16 列坐标约定对照**官方课件** Slide 40；「本课程驱动为直写、无 `OLED_GRAM`/`OLED_Update`」由上述 `OLED.c` 全文核实（除 `OLED_WriteData` 写屏外无任何缓冲区）。
+> **仍未核实**：取模软件（PCtoLCD2002）的阴码/阳码、逐行/逐列、C51 格式等具体设置（官方资料中未见）；本集视频的讲解详略与实际演示例程；第 4.1 节对照表中「新版驱动」列的多项 API 细节（新版代码不在本机资料中，仅据官方驱动页 <https://jiangxiekeji.com/tutorial/oled.html> 整理）。**未逐帧核对视频画面**，若与视频有出入以视频为准。

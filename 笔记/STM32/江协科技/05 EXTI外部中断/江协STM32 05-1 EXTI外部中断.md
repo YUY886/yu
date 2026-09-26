@@ -11,6 +11,7 @@ tags:
   - NVIC
   - AFIO
 status: draft
+verify: 官方源码+接线图+课件
 updated: 2026-09-26
 ---
 
@@ -30,6 +31,14 @@ updated: 2026-09-26
 第 3 章读按键用的是**轮询**（polling）：主循环里一遍遍 `if (GPIO_ReadInputDataBit(...) == 0)`，CPU 被死死绑在「等」这件事上。
 
 **中断**（interrupt）是反过来的思路：CPU 该干嘛干嘛，让外设自己盯着；一旦有情况，外设发一个「中断请求」（interrupt request）把 CPU 打断，CPU 停下当前指令、保存现场、跳去执行一段预先写好的函数，执行完再回来接着跑。
+
+> [!quote] 课件定义（Slide 41）
+> **中断**：在主程序运行过程中，出现了特定的**中断触发条件（中断源）**，使得 CPU 暂停当前正在运行的程序，转而去处理中断程序，处理完成后又返回原来被暂停的位置继续运行。
+> **中断优先级**：当有多个中断源同时申请中断时，CPU 会根据中断源的**轻重缓急**进行裁决，优先响应更加紧急的中断源。
+> **中断嵌套**：当一个中断程序正在运行时，又有新的更高优先级的中断源申请中断，CPU 再次暂停当前中断程序，转而去处理新的中断程序，处理完成后依次进行返回。
+
+> [!note] 中断通道与优先级档位（课件 Slide 43）
+> STM32 有 **68 个可屏蔽中断通道**（含 EXTI、TIM、ADC、USART、SPI、I2C、RTC 等），统一由 NVIC 管理，**每个中断通道都有 16 个可编程的优先等级**，可再分组为抢占优先级与响应优先级。
 
 ```text
 轮询：  CPU ──► 读 ──► 读 ──► 读 ──► 读 ──► ...      （CPU 全耗在等待上）
@@ -557,13 +566,51 @@ EXTI_GenerateSWInterrupt(EXTI_Line14);
 
 ## 10 待核对
 
-- [ ] 视频中 `NVIC_PriorityGroupConfig()` 的**分组取值**，以及 `PreemptionPriority` / `SubPriority` 的**具体数值**。（本页代码按第三方整理的示例取了 `Group_2` / `1` / `1`，未逐帧核对视频。）
-- [ ] 老师对「为什么要开 AFIO 时钟」的**画面演示方式**（是否现场演示了不开时钟的现象）。
-- [ ] EXTI 内部结构框图的**逐块讲解顺序**与老师强调的重点（本页按「边沿检测 → 挂起 → 屏蔽 → 输出」组织）。
-- [ ] 「中断 vs 事件」在视频里的**具体举例**（本页举的 ADC / DMA / 级联定时器例子为通用用法，非视频原话）。
-- [ ] 课程板对射式红外传感器接的**具体引脚**（配套源码镜像中为 PB14，是否与视频一致未核对）。
-- [ ] `NVIC_PriorityGroupConfig()` 在视频里是写在 `CountSensor_Init()` 内还是 `main()` 内。
+- [ ] 老师对「为什么要开 AFIO 时钟」的**画面演示方式**（是否现场演示了不开时钟的现象）——视频画面无法从源码/接线图/课件核实。
+- [ ] EXTI 内部结构框图（课件 Slide 49 仅标题「EXTI 框图」，无文字标注）的**逐块讲解顺序**与老师强调的重点。
+- [ ] 「中断 vs 事件」在视频里的**具体举例**：课件 Slide 46 只写了「触发响应方式：中断响应 / 事件响应」，**未展开**；本页举的 ADC / DMA / 级联定时器为通用用法，官方资料中未见此讲解。
+- [ ] 视频中讲解 5-1 时是否有独立的代码演示（官方工程目录里没有 5-1 独立工程，代码在 `5-1 对射式红外传感器计次` 中）。
+
+## 核对记录（2026-09-26）
+
+> [!success] 核对依据
+> - 官方配套源码：`5-1 对射式红外传感器计次\Hardware\CountSensor.c`、`CountSensor.h`、`User\main.c`（`C:\Users\陈杰裕\Desktop\资料\STM32入门教程资料\程序源码\程序源码\STM32Project-有注释版\`）
+> - 官方接线图：`D:\deepseekwork\ground-truth\接线图\5-1 对射式红外传感器计次.png`（逐张放大查看红色 VCC / 蓝色 GND / 绿色 DO 三条线的落点）
+> - 课件文本：`D:\deepseekwork\ground-truth\课件文本.md` Slide 41 ~ Slide 49
+> - 固件库头文件：`misc.h`、`stm32f10x_exti.h`、`stm32f10x_gpio.h`；IRQn 枚举在 `stm32f10x.h`（STM32F10x_StdPeriph_Lib_V3.5.0）
+> - 引脚定义表：`D:\deepseekwork\ground-truth\F103C8T6引脚定义_缩略.png`
+
+| 核对项 | 笔记原值 | 官方依据 | 结论 |
+| --- | --- | --- | --- |
+| 红外传感器接入引脚 | PB14（原标注「配套源码镜像中为 PB14，未核对」） | 源码 `GPIO_Pin = GPIO_Pin_14` + `GPIO_Init(GPIOB, ...)`；接线图绿色 DO 线落在 B14 号孔 | 一致 |
+| `GPIO_Mode` | `GPIO_Mode_IPU`（上拉输入） | `CountSensor.c` 第 18 行 `GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;` | 一致 |
+| `GPIO_EXTILineConfig` 参数 | `GPIO_PortSourceGPIOB, GPIO_PinSource14` | `CountSensor.c` 第 24 行完全相同 | 一致 |
+| `EXTI_Line` | `EXTI_Line14` | `CountSensor.c` 第 28 行 | 一致 |
+| `EXTI_Mode` | `EXTI_Mode_Interrupt` | `CountSensor.c` 第 30 行 | 一致 |
+| 触发边沿 | `EXTI_Trigger_Falling`（下降沿） | `CountSensor.c` 第 31 行 | 一致 |
+| NVIC 分组 | `NVIC_PriorityGroup_2` | `CountSensor.c` 第 35 行 | 一致 |
+| NVIC 中断通道 | `EXTI15_10_IRQn` | `CountSensor.c` 第 43 行 | 一致 |
+| 抢占 / 响应优先级数值 | 抢占 1、响应 1 | `CountSensor.c` 第 45~46 行：`PreemptionPriority = 1`、`SubPriority = 1` | 一致 |
+| 分组函数调用位置 | 「写在 `main()` 里，这里为了代码完整也写一遍」（示例放在 `CountSensor_Init()` 内） | `CountSensor.c` 确实写在 `CountSensor_Init()` 内；注释说也可放 `main()` | 一致 |
+| 中断服务函数名 | `EXTI15_10_IRQHandler` | `CountSensor.c` 第 68 行 | 一致 |
+| 中断内先判断线的写法 | `if (EXTI_GetITStatus(EXTI_Line14) == SET)` | `CountSensor.c` 第 70 行 | 一致 |
+| 中断内二次读引脚消抖 | `if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_14) == 0)` | `CountSensor.c` 第 73 行 | 一致 |
+| 中断内清标志 | `EXTI_ClearITPendingBit(EXTI_Line14)` | `CountSensor.c` 第 77 行 | 一致 |
+| 计数值变量与返回类型 | `uint16_t CountSensor_Count`、`uint16_t CountSensor_Get(void)` | `CountSensor.c` 第 3 / 55 行 | 一致 |
+| `main.c` 内容 | `OLED_Init(); CountSensor_Init(); OLED_ShowString(1,1,"Count:");` 循环 `OLED_ShowNum(1, 7, CountSensor_Get(), 5)` | `5-1 ...\User\main.c` 第 9~18 行完全相同 | 一致 |
+| `IRQn_Type` 枚举数值（EXTI0~4 = 6~10、EXTI9_5 = 23、EXTI15_10 = 40、TIM2 = 28） | 表中这 8 行数值 | `stm32f10x.h` 的 `IRQn_Type` 枚举逐条一致 | 一致 |
+| `SysTick_IRQn = -1` 等内核异常为负数 | 正文表述 | `stm32f10x.h`：`SysTick_IRQn = -1`、`NonMaskableInt_IRQn = -14` | 一致 |
+| EXTI 共 20 条线（Line0~Line19）与各线来源 | Line16 PVD、Line17 RTC 闹钟、Line18 USB 唤醒、Line19 以太网唤醒 | `stm32f10x_exti.h` 第 103~123 行：`EXTI_Line19 ... Connected to the Ethernet Wakeup event`，与课件 Slide 46 一致 | 一致 |
+| AFIO 是「16 选 1」，同号引脚同时只能选一个 | PA0 / PB0 / PC0 只能选一个接 Line0 | 课件 Slide 47 框图标注 AFIO「中断引脚选择 16」、GPIOA/B/C 各「16」；Slide 46：「相同的 Pin 不能同时触发中断」 | 一致 |
+| `EXTI_Mode_Interrupt` / `EXTI_Mode_Event` 取值 | `0x00` / `0x04` | `stm32f10x_exti.h` 第 52~53 行 | 一致 |
+| `EXTI_Trigger_*` 三个枚举 | `Rising` / `Falling` / `Rising_Falling` | `stm32f10x_exti.h` 第 64~66 行 | 一致 |
+| `EXTI_GetFlagStatus` / `EXTI_ClearFlag`（主程序）与 `EXTI_GetITStatus` / `EXTI_ClearITPendingBit`（中断）分工 | 两组分工表 | `stm32f10x_exti.h` 第 162~165 行，两组函数均存在且注释区分 IT / Flag | 一致 |
+| `GPIO_PinSource14` 是序号而非位掩码 | 「序号 14，不是 `GPIO_Pin_14`」 | `stm32f10x_gpio.h`：`GPIO_PinSource14 ((uint8_t)0x0E)`；`GPIO_Pin_14` 为位掩码 | 一致 |
+| `NVIC_InitTypeDef` 四个成员 | `NVIC_IRQChannel` / `NVIC_IRQChannelPreemptionPriority` / `NVIC_IRQChannelSubPriority` / `NVIC_IRQChannelCmd` | `misc.h` 第 50~67 行结构体定义 | 一致 |
+| `NVIC_PriorityGroup_2` 库函数说明表（分组 0~4 的抢占/响应取值） | 正文表 | `misc.h` 第 85~97 行注释表逐行一致 | 一致 |
+| 中断定义、优先级、嵌套的表述 | 第 1 节只有自行组织的文字表述 | 课件 Slide 41 有明确的定义原文 | 已修正（原为「外设发一个中断请求…」等自述，现保留自述并补入课件 Slide 41 的定义原文） |
+| 中断通道数量 | 原无此信息 | 课件 Slide 43：「68 个可屏蔽中断通道」「每个中断通道都拥有 16 个可编程的优先等级」 | 已修正（原为缺项，现补入） |
 
 > [!note] 出处说明
-> 本页的中断/NVIC/EXTI/AFIO 概念、寄存器行为与库函数签名依据 STM32F10x 标准外设库头文件（`misc.h`、`stm32f10x_exti.h`、`stm32f10x_gpio.h`）、`IRQn_Type` 枚举表与课程配套示例源码（`CountSensor.c` / `CountSensor.h`）整理；六步流程与讲解顺序参照课程公开讲义及多份同课程公开笔记。
-> **未逐帧核对视频画面**，优先级分组与优先级数值等细节均列入上方「待核对」，若与视频有出入以视频为准。
+> 已对照**官方配套源码**（`CountSensor.c` / `CountSensor.h` / `main.c` 逐行）、**官方接线图**（`5-1 对射式红外传感器计次.png`，放大确认 DO 线落在 B14 号孔）、**课程课件文本**（Slide 41~49）与 **STM32F10x 标准外设库 V3.5.0 头文件**（`misc.h`、`stm32f10x_exti.h`、`stm32f10x_gpio.h`、`stm32f10x.h`）核对。
+> 仍未核实的是：① 视频中「为什么要开 AFIO 时钟」的画面演示方式；② EXTI 框图的逐块讲解顺序（课件该页只有标题）；③ 「中断 vs 事件」的视频举例（课件未展开，本页所举通用例子官方资料中未见）。这三点已列入上方「待核对」。

@@ -10,6 +10,7 @@ tags:
   - 推挽输出
   - 开漏输出
 status: draft
+verify: 官方源码+接线图+课件
 updated: 2026-09-26
 ---
 
@@ -451,11 +452,32 @@ GPIO_Write(GPIOA, 0xFFFE);   // 1111 1111 1111 1110，只有 PA0 为低，其余
 
 ## 11 待核对
 
-- [ ] 课程实际演示中"点亮 LED"用的是哪个引脚，以及该引脚在课程开发板上的实际接法（高电平点亮还是低电平点亮）。
-- [ ] 视频里老师对 `GPIO_Speed` 三档（10MHz / 2MHz / 50MHz）的取舍建议原话。
-- [ ] 位结构框图中 `VDD_FT` 保护电路的具体讲法。
-- [ ] 位带（Bit-Band）别名区地址的具体数值是否在视频中给出。
-- [ ] 课程 PPT 中"TTL 肖特基触发器"是否为课堂沿用叫法。
+- [ ] 位带（Bit-Band）别名区地址的具体数值是否在视频中给出（**官方源码、接线图、课件文本中均未见**）。
+- [ ] 位结构框图中 `VDD_FT` 保护电路的具体讲法、以及「TTL 肖特基触发器」是否为课件/课堂沿用叫法。**课件文本 Slide 20「GPIO 位结构」只有一张图、可提取文本里没有这些标注**，无法从可获取文本中核实（见 3.1、3.3 两处 callout）。
+
+## 核对记录（2026-09-26）
+
+> [!success] 核对依据
+> - 固件库头文件：`STM32F10x_StdPeriph_Lib_V3.5.0\STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_gpio.h`
+> - 课件文本：`课件文本.md`（Slide 18 GPIO 简介、Slide 19 GPIO 基本结构、Slide 21 GPIO 模式表）
+> - 官方源码：`STM32Project-有注释版\3-1 LED闪烁\User\main.c`、`3-2 LED流水灯\User\main.c`、`3-3 蜂鸣器\User\main.c`、`3-4 按键控制LED\Hardware\LED.c`、`Key.c`、`3-5 光敏传感器控制蜂鸣器\Hardware\LightSensor.c`
+> - 官方接线图：`接线图\3-1 LED闪烁.png`、`3-2 LED流水灯.png`、`3-3 蜂鸣器.png`、`3-4 按键控制LED.png`
+> - 引脚定义表：`F103C8T6引脚定义_缩略.png`
+
+| 核对项 | 笔记原值 | 官方依据 | 结论 |
+| --- | --- | --- | --- |
+| 8 种模式枚举值 | `GPIO_Mode_Out_PP = 0x10`、`GPIO_Mode_IPU = 0x48` 等 | `stm32f10x_gpio.h` 第 72~80 行逐条给出同样数值 | 一致 |
+| 「低 4 位是 MODE+CNF，高 4 位是判断标志」 | 见 7.3 节 callout | 库头文件数值与 RM0008 的 CRL/CRH 编码吻合（`Out_PP=0x10`→MODE=11/CNF=00，`IPU=0x48`→MODE=10/CNF=10） | 一致 |
+| 三个速度枚举 | `GPIO_Speed_10MHz`/`2MHz`/`50MHz` | 库头文件第 60~62 行完全一致 | 一致 |
+| `GPIO_InitTypeDef` 三个成员 | `GPIO_Pin` / `GPIO_Speed` / `GPIO_Mode` | 库头文件第 91~100 行，成员顺序与类型一致 | 一致 |
+| `BitAction` 枚举 | `Bit_RESET = 0`、`Bit_SET` | 库头文件第 109~110 行一致 | 一致 |
+| `GPIO_Pin_x = 1 << x`，`GPIO_Pin_All = 0xFFFF` | 见 7.3 节二进制表 | 库头文件第 142~143 行：`GPIO_Pin_15 = 0x8000`、`GPIO_Pin_All = 0xFFFF` | 一致 |
+| 库函数原型清单 | 第 7.2 节 12 个原型 | 库头文件第 276~290 行、353~361 行逐个比对，签名与返回类型均一致 | 一致 |
+| GPIO 挂 APB2，开时钟用 `RCC_APB2PeriphClockCmd` | 见第 2、7.1 节 | 课件文本 Slide 19「APB2」；官方 `3-1\User\main.c` 第 7 行正是 `RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE)` | 一致 |
+| 输出模式仍可读回引脚真实电平 | 见 4.3 节 callout | 官方 `LED.c` 的 `LED1_Turn()` 用 `GPIO_ReadOutputDataBit` 读 ODR 取反（读的是 ODR 而非 IDR，本页表述正确） | 一致 |
+| 引脚电平 0~3.3V、FT 引脚可容忍 5V 输入、输出仍为 3.3V | 见第 1 节 | 课件文本 Slide 18「引脚电平：0V~3.3V，部分引脚可容忍 5V」；引脚定义表设 `I/O电平(FT)` 一列，PB12/PB13 等标 FT | 一致 |
+| 「点亮 LED」用的引脚（8.2 节示例） | 示例写「PA0，低电平点亮」，原在待核对中标注「课程实际用哪个引脚未确认」 | 官方 `3-1 LED闪烁\User\main.c`：`GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0`（PA0），`GPIO_ResetBits` 为亮；接线图 3-1 中 LED 阳极经导线接正电源轨 | 一致（依官方源码与接线图确认，已移出待核对） |
+| 流水灯实测细节（开漏点不亮 LED） | 见 8.4 节 | 官方源码与接线图均为推挽输出实验，**未见开漏输出的实测演示**；该结论属 STM32 开漏电气特性推论 | 一致（原理推论，依据中无对应实验） |
 
 > [!note] 出处说明
-> 本页位结构、8 种工作模式、寄存器行为与库函数原型依据 ST 标准外设库 `stm32f10x_gpio.h` / `stm32f10x_rcc.h` 及课程公开讲义整理；引脚电平、FT 标记、推挽/开漏特性为 STM32F103 既定事实。未逐帧核对视频画面，若与视频有出入以视频为准。
+> 本页位结构、8 种工作模式、寄存器行为与库函数原型已对照 **ST 标准外设库 V3.5.0 `stm32f10x_gpio.h`**、**官方配套源码（`STM32Project-有注释版\3-1`~`3-5`）**、**官方接线图（`接线图\3-1`~`3-5`）**、**课程课件 `课件文本.md`（Slide 18/19/21）** 与 **引脚定义表** 逐条核对；引脚电平、FT 标记、推挽/开漏特性为 STM32F103 既定事实。**仍未核实**：位带别名区地址的具体数值、课件 PPT「GPIO 位结构」图中「TTL 肖特基触发器」这一标注（该页只有图片，无法从文本提取）、以及视频画面中的讲解原话。
