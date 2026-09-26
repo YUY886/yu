@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "笔记/STM32/江协科技/06-1 TIM定时中断.md",
+                "file": "笔记/STM32/江协科技/江协STM32 06 TIM定时器（章索引）.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "06-1 TIM定时中断"
+              "title": "江协STM32 06 TIM定时器（章索引）"
             }
           }
         ]
@@ -199,9 +199,12 @@
   },
   "active": "36e2b7bf547fff30",
   "lastOpenFiles": [
-    "笔记/STM32/江协科技/06 TIM定时器.md",
-    "笔记/STM32/江协科技/06定时器.md",
+    "笔记/STM32/江协科技/江协STM32 06-1 TIM定时中断.md",
     "笔记/STM32/江协科技/06-1 TIM定时中断.md",
+    "笔记/STM32/江协科技/06定时器.md",
+    "笔记/STM32/江协科技/06 TIM定时器.md",
+    "笔记/STM32/江协科技/江协STM32 06 TIM定时器（章索引）.md",
+    "笔记/STM32/江协科技/江协STM32 06-2 定时器外部时钟.md",
     "笔记/STM32.zip",
     "笔记/我的第一篇笔记.md",
     "笔记/STM32/江协科技",
