@@ -120,8 +120,9 @@ updated: 2026-09-26
 
 ## 相邻章节
 
-- 上一章：EXTI 外部中断（[5-1](https://www.bilibili.com/video/BV1th411z7sn?p=11) / [5-2](https://www.bilibili.com/video/BV1th411z7sn?p=12)）
-- 下一章：ADC 模数转换器（[7-1](https://www.bilibili.com/video/BV1th411z7sn?p=21) / [7-2](https://www.bilibili.com/video/BV1th411z7sn?p=22)）
+- 上一章：[[江协STM32 05 EXTI外部中断（章索引）]]（[5-1 P11](https://www.bilibili.com/video/BV1th411z7sn?p=11) / [5-2 P12](https://www.bilibili.com/video/BV1th411z7sn?p=12)）
+- 下一章：[[江协STM32 07 ADC模数转换器（章索引）]]（[7-1 P21](https://www.bilibili.com/video/BV1th411z7sn?p=21) / [7-2 P22](https://www.bilibili.com/video/BV1th411z7sn?p=22)）（待写）
+- 上级：[[江协STM32 课程总索引]]
 - 课程主页：<https://www.bilibili.com/video/BV1th411z7sn>
 
 > [!note] 出处说明
