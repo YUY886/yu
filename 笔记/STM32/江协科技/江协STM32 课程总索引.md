@@ -47,11 +47,11 @@ updated: 2026-09-26
 | 04 | [[江协STM32 04 OLED（章索引）\|OLED]] | 4-1 ~ 4-2 | P9 ~ P10 | 已完成 ✅ |
 | 05 | [[江协STM32 05 EXTI外部中断（章索引）\|EXTI 外部中断]] | 5-1 ~ 5-2 | P11 ~ P12 | 已完成 ✅ |
 | 06 | [[江协STM32 06 TIM定时器（章索引）\|TIM 定时器]] | 6-1 ~ 6-8 | P13 ~ P20 | 已完成 ✅ |
-| 07 | ADC 模数转换器 | 7-1 ~ 7-2 | P21 ~ P22 | 未开始 |
-| 08 | DMA 直接存储器存取 | 8-1 ~ 8-2 | P23 ~ P24 | 未开始 |
-| 09 | USART 串口 | 9-1 ~ 9-6 | P25 ~ P30 | 未开始 |
-| 10 | I2C 通信 / MPU6050 | 10-1 ~ 10-5 | P31 ~ P35 | 未开始 |
-| 11 | SPI 通信 / W25Q64 | 11-1 ~ 11-5 | P36 ~ P40 | 未开始 |
+| 07 | [[江协STM32 07 ADC（章索引）\|ADC 模数转换器]] | 7-1 ~ 7-2 | P21 ~ P22 | 已完成 ✅ |
+| 08 | [[江协STM32 08 DMA（章索引）\|DMA 直接存储器存取]] | 8-1 ~ 8-2 | P23 ~ P24 | 已完成 ✅ |
+| 09 | [[江协STM32 09 USART串口（章索引）\|USART 串口]] | 9-1 ~ 9-5 | P25 ~ P29 | 已完成 ✅（9-6 未做） |
+| 10 | [[江协STM32 10 I2C（章索引）\|I2C 通信 / MPU6050]] | 10-1 ~ 10-5 | P31 ~ P35 | 已完成 ✅ |
+| 11 | [[江协STM32 11 SPI（章索引）\|SPI 通信 / W25Q64]] | 11-1 ~ 11-5 | P36 ~ P40 | 已完成 ✅ |
 | 12 | Unix 时间戳 / BKP / RTC | 12-1 ~ 12-3 | P41 ~ P43 | 未开始 |
 | 13 | PWR 电源控制 | 13-1 ~ 13-2 | P44 ~ P45 | 未开始 |
 | 14 | WDG 看门狗 | 14-1 ~ 14-2 | P46 ~ P47 | 未开始 |
@@ -119,6 +119,61 @@ updated: 2026-09-26
 | 6-7 | TIM编码器接口 | [P19](https://www.bilibili.com/video/BV1th411z7sn?p=19) | [[江协STM32 06-7 TIM编码器接口]] |
 | 6-8 | 编码器接口测速 | [P20](https://www.bilibili.com/video/BV1th411z7sn?p=20) | [[江协STM32 06-8 编码器接口测速]] |
 
+## 07 ADC
+
+入口：[[江协STM32 07 ADC（章索引）]]
+
+| 集 | 标题 | 页码 | 笔记 |
+| --- | --- | --- | --- |
+| 7-1 | ADC模数转换器 | [P21](https://www.bilibili.com/video/BV1th411z7sn?p=21) | [[江协STM32 07-1 ADC模数转换器]] |
+| 7-2 | AD单通道&AD多通道 | [P22](https://www.bilibili.com/video/BV1th411z7sn?p=22) | [[江协STM32 07-2 AD单通道与AD多通道]] |
+
+## 08 DMA
+
+入口：[[江协STM32 08 DMA（章索引）]]
+
+| 集 | 标题 | 页码 | 笔记 |
+| --- | --- | --- | --- |
+| 8-1 | DMA直接存储器存取 | [P23](https://www.bilibili.com/video/BV1th411z7sn?p=23) | [[江协STM32 08-1 DMA直接存储器存取]] |
+| 8-2 | DMA数据转运&DMA+AD多通道 | [P24](https://www.bilibili.com/video/BV1th411z7sn?p=24) | [[江协STM32 08-2 DMA数据转运与DMA+AD多通道]] |
+
+## 09 USART 串口
+
+入口：[[江协STM32 09 USART串口（章索引）]]
+
+| 集 | 标题 | 页码 | 笔记 |
+| --- | --- | --- | --- |
+| 9-1 | USART串口协议 | [P25](https://www.bilibili.com/video/BV1th411z7sn?p=25) | [[江协STM32 09-1 USART串口协议]] |
+| 9-2 | USART串口外设 | [P26](https://www.bilibili.com/video/BV1th411z7sn?p=26) | [[江协STM32 09-2 USART串口外设]] |
+| 9-3 | 串口发送&串口发送+接收 | [P27](https://www.bilibili.com/video/BV1th411z7sn?p=27) | [[江协STM32 09-3 串口发送与串口发送接收]] |
+| 9-4 | USART串口数据包 | [P28](https://www.bilibili.com/video/BV1th411z7sn?p=28) | [[江协STM32 09-4 USART串口数据包]] |
+| 9-5 | 串口收发HEX数据包&串口收发文本数据包 | [P29](https://www.bilibili.com/video/BV1th411z7sn?p=29) | [[江协STM32 09-5 串口收发HEX数据包与文本数据包]] |
+| 9-6 | FlyMcu串口下载&STLINK Utility | [P30](https://www.bilibili.com/video/BV1th411z7sn?p=30) | 本次未做 |
+
+## 10 I2C
+
+入口：[[江协STM32 10 I2C（章索引）]]
+
+| 集 | 标题 | 页码 | 笔记 |
+| --- | --- | --- | --- |
+| 10-1 | I2C通信协议 | [P31](https://www.bilibili.com/video/BV1th411z7sn?p=31) | [[江协STM32 10-1 I2C通信协议]] |
+| 10-2 | MPU6050简介 | [P32](https://www.bilibili.com/video/BV1th411z7sn?p=32) | [[江协STM32 10-2 MPU6050简介]] |
+| 10-3 | 软件I2C读写MPU6050 | [P33](https://www.bilibili.com/video/BV1th411z7sn?p=33) | [[江协STM32 10-3 软件I2C读写MPU6050]] |
+| 10-4 | I2C通信外设 | [P34](https://www.bilibili.com/video/BV1th411z7sn?p=34) | [[江协STM32 10-4 I2C通信外设]] |
+| 10-5 | 硬件I2C读写MPU6050 | [P35](https://www.bilibili.com/video/BV1th411z7sn?p=35) | [[江协STM32 10-5 硬件I2C读写MPU6050]] |
+
+## 11 SPI
+
+入口：[[江协STM32 11 SPI（章索引）]]
+
+| 集 | 标题 | 页码 | 笔记 |
+| --- | --- | --- | --- |
+| 11-1 | SPI通信协议 | [P36](https://www.bilibili.com/video/BV1th411z7sn?p=36) | [[江协STM32 11-1 SPI通信协议]] |
+| 11-2 | W25Q64简介 | [P37](https://www.bilibili.com/video/BV1th411z7sn?p=37) | [[江协STM32 11-2 W25Q64简介]] |
+| 11-3 | 软件SPI读写W25Q64 | [P38](https://www.bilibili.com/video/BV1th411z7sn?p=38) | [[江协STM32 11-3 软件SPI读写W25Q64]] |
+| 11-4 | SPI通信外设 | [P39](https://www.bilibili.com/video/BV1th411z7sn?p=39) | [[江协STM32 11-4 SPI通信外设]] |
+| 11-5 | 硬件SPI读写W25Q64 | [P40](https://www.bilibili.com/video/BV1th411z7sn?p=40) | [[江协STM32 11-5 硬件SPI读写W25Q64]] |
+
 ## 学习路线
 
 ```text
@@ -134,6 +189,10 @@ updated: 2026-09-26
 - **第 5 章是第 6 章的前置**：NVIC、中断优先级分组、中断服务函数这几件事在 5-1 就讲过了，6-1 直接用。
 - **5-2 与 6-7 是同一个问题的两种解法**：5-2 用 EXTI 手动判方向数编码器，6-7 改用定时器编码器接口硬件自动完成。两篇对照着看，能体会"该交给硬件的就交给硬件"。
 - **第 6 章是全课程最重的一章**：8 集、约 5 小时，也是后面电机控制、传感器采集的地基。
+- **第 7 章 ADC 与第 8 章 DMA 是一对**：7-2 多通道 AD 要手动切换通道，8-2 用 DMA 自动搬运。两篇连起来看才完整。
+- **第 6 章的输出比较是第 10、11 章的伏笔**：软件 I2C 要开漏输出、软件 SPI 要推挽输出，这两种 GPIO 模式在 3-1 就讲过，这里才用到实处。
+- **第 10、11 章都是「先协议 → 再外设 → 再硬件实现」的三段式**：10-1/10-4 讲 I2C 协议与硬件外设，10-3/10-5 是软件版与硬件版的同一件事；11 章同构。**软件版和硬件版的逐函数对照表是这两章最值钱的部分。**
+- **9-6 只讲下载工具**（FlyMcu / STLINK Utility），没有新外设知识，本次按你的要求跳过。
 
 > [!tip] 怎么用这套笔记
 > 每篇分集笔记的结构是固定的：**开篇一句话点明这集解决的问题 → 原理与电路 → 参数表 → 完整代码 → 易错点清单 → 自测题（带折叠答案）→ 待核对 → 核对记录**。
