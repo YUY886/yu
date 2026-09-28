@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "笔记/STM32/江协科技/10 I2C/江协STM32 10-1 I2C通信协议.md",
+                "file": "笔记/STM32/江协科技/01 STM32简介/江协STM32 01-2 STM32简介.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "江协STM32 10-1 I2C通信协议"
+              "title": "江协STM32 01-2 STM32简介"
             }
           }
         ]
@@ -199,13 +199,14 @@
   },
   "active": "36e2b7bf547fff30",
   "lastOpenFiles": [
+    "笔记/STM32/江协科技/03 GPIO/江协STM32 03-4 按键控制LED与光敏传感器.md",
+    "笔记/STM32/江协科技/10 I2C/江协STM32 10-1 I2C通信协议.md",
     "笔记/STM32/江协科技/10 I2C/江协STM32 10 I2C（章索引）.md",
     "笔记/STM32/江协科技/10 I2C/江协STM32 10-2 MPU6050简介.md",
     "笔记/STM32/江协科技/10 I2C/江协STM32 10-4 I2C通信外设.md",
     "笔记/STM32/江协科技/10 I2C/江协STM32 10-5 硬件I2C读写MPU6050.md",
     "笔记/STM32/江协科技/10 I2C/江协STM32 10-3 软件I2C读写MPU6050.md",
     "笔记/STM32/江协科技/江协STM32 课程总索引.md",
-    "笔记/STM32/江协科技/03 GPIO/江协STM32 03-4 按键控制LED与光敏传感器.md",
     "笔记/STM32/江协科技/01 STM32简介/江协STM32 01-2 STM32简介.md",
     "笔记/STM32/江协科技/05 EXTI外部中断/江协STM32 05-2 红外传感器计次与旋转编码器计次.md",
     "笔记/STM32/江协科技/04 OLED/江协STM32 04 OLED（章索引）.md",
@@ -229,7 +230,6 @@
     "笔记/STM32/江协科技/01 STM32简介/江协STM32 01-1 课程简介.md",
     "笔记/STM32/江协科技/01 STM32简介",
     "笔记/STM32/江协科技/06 TIM定时器/江协STM32 06-7 TIM编码器接口.md",
-    "笔记/STM32/江协科技/_旧稿归档/06 TIM定时器.md",
     "笔记/STM32/江协科技/06 TIM定时器.zip",
     "笔记/STM32.zip",
     "笔记/STM32/江协科技",
