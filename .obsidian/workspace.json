@@ -4,17 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "55304d7f4993492b",
+        "id": "627ec50eab4c63cf",
         "type": "tabs",
         "children": [
           {
-            "id": "58b65571187d7703",
+            "id": "04dc713e4da2dda8",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "关系图谱"
+              "type": "markdown",
+              "state": {
+                "file": "笔记/STM32/江协科技/04 OLED/江协STM32 04-1 OLED调试工具.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "江协STM32 04-1 OLED调试工具"
             }
           }
         ]
@@ -111,12 +115,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "ok.md",
+                "file": "笔记/STM32/江协科技/04 OLED/江协STM32 04-1 OLED调试工具.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "ok 的出链列表"
+              "title": "出链"
             }
           },
           {
@@ -174,11 +178,12 @@
             }
           }
         ],
-        "currentTab": 5
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 200,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -192,7 +197,7 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "58b65571187d7703",
+  "active": "04dc713e4da2dda8",
   "lastOpenFiles": [
     "未命名.canvas",
     "2026-10-24.md",
