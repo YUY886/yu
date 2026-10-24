@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "笔记/STM32/江协科技/03 GPIO/江协STM32 03-1 GPIO输出.md",
+                "file": "笔记/STM32/江协科技/04 OLED/江协STM32 04-2 OLED显示屏.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "江协STM32 03-1 GPIO输出"
+              "title": "江协STM32 04-2 OLED显示屏"
             }
           }
         ]
@@ -199,6 +199,8 @@
   },
   "active": "36e2b7bf547fff30",
   "lastOpenFiles": [
+    "笔记/STM32/江协科技/03 GPIO/江协STM32 03 GPIO（章索引）.md",
+    "笔记/STM32/江协科技/03 GPIO/江协STM32 03-1 GPIO输出.md",
     "笔记/STM32/江协科技/03 GPIO/江协STM32 03-2 LED闪烁与流水灯与蜂鸣器.md",
     "笔记/STM32/江协科技/03 GPIO/江协STM32 03-3 GPIO输入.md",
     "笔记/STM32/江协科技/03 GPIO/江协STM32 03-4 按键控制LED与光敏传感器.md",
@@ -225,8 +227,6 @@
     "笔记/51/16 AD与DA/江协51 16-1 AD模数转换.md",
     "笔记/51/16 AD与DA/江协51 16-0 章节索引.md",
     "笔记/51/16 AD与DA",
-    "笔记/51/15 直流电机/江协51 15-2 直流电机调速.md",
-    "笔记/51/15 直流电机/江协51 15-1 LED呼吸灯.md",
     "笔记/51/15 直流电机",
     "笔记/51/14 LCD1602",
     "笔记/51/13 DS18B20温度传感器",
