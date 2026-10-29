@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "笔记/STM32/江协科技/05 EXTI外部中断/江协STM32 05-2 红外传感器计次与旋转编码器计次.md",
+                "file": "笔记/51/01 单片机概述/江协51 01-1 课程导览与开发环境.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "江协STM32 05-2 红外传感器计次与旋转编码器计次"
+              "title": "江协51 01-1 课程导览与开发环境"
             }
           }
         ]
@@ -199,10 +199,10 @@
   },
   "active": "04dc713e4da2dda8",
   "lastOpenFiles": [
-    "笔记/51.zip",
     "笔记/STM32/江协科技/05 EXTI外部中断/江协STM32 05-1 EXTI外部中断.md",
     "笔记/STM32/江协科技/05 EXTI外部中断/江协STM32 05-2 红外传感器计次与旋转编码器计次.md",
     "笔记/STM32/江协科技/05 EXTI外部中断/江协STM32 05 EXTI外部中断（章索引）.md",
+    "笔记/51.zip",
     "笔记/STM32/江协科技/04 OLED/江协STM32 04 OLED（章索引）.md",
     "笔记/STM32/江协科技/04 OLED/江协STM32 04-1 OLED调试工具.md",
     "未命名.canvas",
@@ -235,7 +235,6 @@
     "笔记/51/11 蜂鸣器",
     "笔记/51/10 DS1302实时时钟",
     "笔记/51/09 LED点阵屏",
-    "笔记/51/08 串口通信",
     "Pasted image 20260509190635.png",
     "Pasted image 20260510155703.png",
     "Pasted image 20260509193341.png",
